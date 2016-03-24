@@ -1,0 +1,8 @@
+data collected from simulations run on SciNet system March 2016.
+
+KCC2 extrusion scaled by volume. 
+
+Files used for data collection can be found at: https://github.com/annikc/MultiCompartmentModel/tree/KCC2vol
+
+
+README last updated: MAR 24, 2016
