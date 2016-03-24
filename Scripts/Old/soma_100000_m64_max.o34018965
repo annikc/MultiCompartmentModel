@@ -1,0 +1,229 @@
+----------------------------------------
+Begin PBS Prologue Fri Feb 12 06:16:34 EST 2016 1455275794
+Job ID:		34018965.gpc-sched-ib0
+Username:	annik
+Group:		tyrell
+Nodes:		gpc-f148n022-ib0
+End PBS Prologue Fri Feb 12 06:16:37 EST 2016 1455275797
+----------------------------------------
+/scratch/t/tyrell/annik/MultiVarSim
+AMPA.mod CClamp.mod GABAa.mod HH.mod KCC2.mod KCC2_Trans.mod cad.mod calH.mod calL.mod cat.mod
+AMPA.mod CClamp.mod GABAa.mod HH.mod KCC2.mod KCC2_Trans.mod cad.mod calH.mod calL.mod cat.mod
+	1 
+GABA Synapses in: Soma
+Synaptic Density = 12.5 
+Creating cell...
+	0 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+	1 
+          ... cell created successfully.
+Initializing somatic collection data
+soma 1  finished
+Initializing proximal collection data
+proximal 1  finished
+proximal 2  finished
+proximal 3  finished
+proximal 4  finished
+proximal 5  finished
+proximal 6  finished
+proximal 7  finished
+proximal 8  finished
+proximal 9  finished
+proximal 10  finished
+proximal 11  finished
+proximal 12  finished
+proximal 13  finished
+proximal 14  finished
+proximal 15  finished
+proximal 16  finished
+proximal 17  finished
+proximal 18  finished
+Initializing middle collection data
+middle 1  finished
+middle 2  finished
+middle 3  finished
+middle 4  finished
+middle 5  finished
+middle 6  finished
+middle 7  finished
+middle 8  finished
+middle 9  finished
+middle 10  finished
+middle 11  finished
+middle 12  finished
+middle 13  finished
+middle 14  finished
+middle 15  finished
+middle 16  finished
+middle 17  finished
+middle 18  finished
+middle 19  finished
+middle 20  finished
+middle 21  finished
+middle 22  finished
+middle 23  finished
+middle 24  finished
+middle 25  finished
+middle 26  finished
+middle 27  finished
+middle 28  finished
+middle 29  finished
+middle 30  finished
+middle 31  finished
+middle 32  finished
+middle 33  finished
+middle 34  finished
+middle 35  finished
+middle 36  finished
+middle 37  finished
+middle 38  finished
+middle 39  finished
+middle 40  finished
+middle 41  finished
+middle 42  finished
+middle 43  finished
+middle 44  finished
+middle 45  finished
+middle 46  finished
+middle 47  finished
+middle 48  finished
+middle 49  finished
+middle 50  finished
+middle 51  finished
+middle 52  finished
+middle 53  finished
+middle 54  finished
+middle 55  finished
+middle 56  finished
+middle 57  finished
+middle 58  finished
+middle 59  finished
+middle 60  finished
+middle 61  finished
+middle 62  finished
+middle 63  finished
+middle 64  finished
+middle 65  finished
+middle 66  finished
+middle 67  finished
+middle 68  finished
+middle 69  finished
+middle 70  finished
+middle 71  finished
+middle 72  finished
+middle 73  finished
+middle 74  finished
+middle 75  finished
+middle 76  finished
+middle 77  finished
+middle 78  finished
+middle 79  finished
+middle 80  finished
+middle 81  finished
+middle 82  finished
+middle 83  finished
+middle 84  finished
+middle 85  finished
+middle 86  finished
+middle 87  finished
+middle 88  finished
+middle 89  finished
+middle 90  finished
+middle 91  finished
+middle 92  finished
+middle 93  finished
+middle 94  finished
+middle 95  finished
+middle 96  finished
+middle 97  finished
+middle 98  finished
+middle 99  finished
+middle 100  finished
+middle 101  finished
+middle 102  finished
+middle 103  finished
+middle 104  finished
+Initializing distal collection data
+distal 1  finished
+distal 2  finished
+distal 3  finished
+distal 4  finished
+distal 5  finished
+distal 6  finished
+distal 7  finished
+distal 8  finished
+distal 9  finished
+distal 10  finished
+distal 11  finished
+distal 12  finished
+distal 13  finished
+distal 14  finished
+distal 15  finished
+distal 16  finished
+distal 17  finished
+distal 18  finished
+distal 19  finished
+distal 20  finished
+distal 21  finished
+distal 22  finished
+distal 23  finished
+distal 24  finished
+distal 25  finished
+distal 26  finished
+distal 27  finished
+distal 28  finished
+distal 29  finished
+distal 30  finished
+distal 31  finished
+distal 32  finished
+distal 33  finished
+distal 34  finished
+distal 35  finished
+distal 36  finished
+distal 37  finished
+distal 38  finished
+distal 39  finished
+distal 40  finished
+distal 41  finished
+distal 42  finished
+distal 43  finished
+distal 44  finished
+distal 45  finished
+distal 46  finished
+distal 47  finished
+distal 48  finished
+distal 49  finished
+distal 50  finished
+distal 51  finished
+distal 52  finished
+distal 53  finished
+distal 54  finished
+distal 55  finished
+distal 56  finished
+distal 57  finished
+distal 58  finished
+data_init finished
+Running simulation 1 of 1  (delta t = -50 ) for GABA @ Soma...
+          ... data (delta t = -50 ) saved to ./data/MCM_STDP_soma.dat
+----------------------------------------
+Begin PBS Epilogue Fri Feb 12 18:11:40 EST 2016 1455318700
+Job ID:		34018965.gpc-sched-ib0
+Username:	annik
+Group:		tyrell
+Job Name:	soma_100000_m64_max
+Session:	12082
+Limits:		neednodes=1:m64g:ppn=16,nodes=1:m64g:ppn=16,walltime=12:00:00
+Resources:	cput=11:54:12,mem=43461504kb,vmem=43574232kb,walltime=11:55:01
+Queue:		sandy
+Account:		
+Nodes:	gpc-f148n022-ib0
+Killing leftovers...
+
+End PBS Epilogue Fri Feb 12 18:11:42 EST 2016 1455318702
+----------------------------------------

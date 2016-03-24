@@ -1,0 +1,84 @@
+///////////////////////////////////////////////////////////////////////////////
+// runSTDP.hoc: running on SciNet system without GUI
+///////////////////////////////////////////////////////////////////////////////
+
+// ************** DEFAULTS SET FOR INDUCTION PROTOCOL OF 20s *****************
+// ********************* INDUCTION 10s, TESTING 10s **************************
+
+//////////////////// procedure calls /////////////////////////////////////
+load_file("nrngui.hoc")
+
+objref p
+p = new PWManager()
+
+strdef outdir, fprefix, syn_loc
+outdir  = "./data"
+
+// Set Location
+proc set_location_paired() {
+	location_paired_prompt = $1
+	if (location_paired_prompt == 0){
+		density_paired_prompt = 12.5
+		print "GABA Synapses in: Soma"
+		print "Synaptic Density = ", density_paired_prompt
+		fprefix = "MCM_STDP_soma"
+		syn_loc = "GABA @ Soma"
+	}
+	if (location_paired_prompt == 1){
+		density_paired_prompt = 0.1334
+		print "GABA Synapses in: Proximal Dendrites"
+		print "Synapse Density = ", density_paired_prompt 
+		fprefix = "MCM_STDP_proximal"
+		syn_loc = "GABA @ Proximal"
+	}
+	if (location_paired_prompt == 2){
+		density_paired_prompt = 0.009
+		print "GABA Synapses in: Middle Dendrites" 
+		print "Synapse Density = ", density_paired_prompt 
+		fprefix = "MCM_STDP_middle"
+		syn_loc = "GABA @ Middle"
+	}
+	if (location_paired_prompt == 3){
+		density_paired_prompt = 0.0025
+		print "GABA Synapses in: Distal Dendrites" 
+		print "Synapse Density = ", density_paired_prompt 
+		fprefix = "MCM_STDP_distal"
+		syn_loc = "GABA @ Distal"
+	}
+}
+
+proc cell_maker(){ local c, j
+	c = p.count()
+	if (c >= 3){
+		for i=1,c-3 {
+			p.close(c - i)
+		}
+	}
+	for j=1,4 {
+		set_location_paired(j-1)
+											
+		interval_paired_prompt = 200
+		number_paired_prompt = 150
+		start_paired_prompt = 10050
+		noise_paired_prompt = 0
+
+		density_unpaired_prompt = 0
+		interval_unpaired_prompt = interval_paired_prompt
+		number_unpaired_prompt = 50
+		start_unpaired_prompt = 10150
+		noise_unpaired_prompt = 0
+
+		clamp_amp_prompt = 3
+		clamp_dur_prompt = 5
+		clamp_int_prompt = interval_paired_prompt
+		clamp_num_prompt = 150
+		clamp_noise_prompt = 0
+
+		seed_prompt = 37264
+
+		print "Creating cell..."
+		xopen("mosinit_membp.hoc")
+		run_sim()
+	}
+}
+cell_maker()
