@@ -48,31 +48,10 @@ proc cell_maker(){ local c
 		}
 	}
 	if (rec_data == 0){
-		xopen("mosinit.hoc")
+		xopen("mosinit_RUNonly.hoc")
 	}
 	if (rec_data == 1) {
 		if (data_type_prompt == 0){
-			xopen("mosinit_v.hoc")
-		}
-		if (data_type_prompt == 1){
-			xopen("mosinit_icl.hoc")
-		}
-		if (data_type_prompt == 2){
-			xopen("mosinit_cli.hoc")
-		}
-		if (data_type_prompt == 3){
-			xopen("mosinit_ecl.hoc")
-		}
-		if (data_type_prompt == 4){
-			xopen("mosinit_KCC2.hoc")
-		}
-		if (data_type_prompt == 5){
-			xopen("mosinit_KCC2step.hoc")
-		}
-		if (data_type_prompt == 6){
-			xopen("mosinit_CaDRC.hoc")
-		}
-		if (data_type_prompt == 7){
 			xopen("mosinit.hoc")
 		}
 	}
@@ -151,27 +130,6 @@ proc cell_maker(){ local c
 	proc set_data_type(){
 		data_type_prompt = $1
 		if (data_type_prompt == 0){
-			data_type_string = "    Voltage (V)"
-		}
-		if (data_type_prompt == 1){
-			data_type_string = "    Chloride Current (iCl)"
-		}
-		if (data_type_prompt == 2){
-			data_type_string = "    Intracellular Chloride Concentration (Cli)"
-		}
-		if (data_type_prompt == 3){
-			data_type_string = "    Chloride Reversal Potential (ECl)"
-		}
-		if (data_type_prompt == 4){
-			data_type_string = "    Record KCC2 Distribution"
-		}
-		if (data_type_prompt == 5){
-			data_type_string = "    Record KCC2, Cycle through delta T values"
-		}
-		if (data_type_prompt == 6){
-			data_type_string = "    Record KCC2, Cycle through resting Ca values"
-		}
-		if (data_type_prompt == 7){
 			data_type_string = "    Record All Data"
 		}
 	}
@@ -244,10 +202,10 @@ xpanel("Specify Parameters")
 		xlabel("       ")
 
 	xlabel("CURRENT CLAMP")
-		clamp_amp_prompt = 0
+		clamp_amp_prompt = 2
 		xvalue("Current Clamp Amp","clamp_amp_prompt", 1)
 		
-		clamp_dur_prompt = 0
+		clamp_dur_prompt = 2
 		xvalue("Current Clamp Duration","clamp_dur_prompt", 1)
 
 		clamp_int_prompt = interval_paired_prompt

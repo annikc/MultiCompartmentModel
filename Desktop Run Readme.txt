@@ -31,4 +31,4 @@ promptWindow.hoc
 
 This should generate all of the windows necessary to play with the model. 
 
-Simulation is run from RunControl window. Plasticity induction is started ~ 10000s after the simulation begins, and is carried out at 5Hz for 30000 ms with clamp amp and duration at 2 nA and 2ms, respectively, as per Woodin et al. (2003). Plasticity induction parameters can be changed in promptWindow (Paired Synapses block). promptWindow defaults should generate the proper plasticity induction protocol. 
+Simulation is run from RunControl window. Plasticity induction is started ~ 10000s after the simulation begins, and is carried out at 5Hz for 30000 ms with clamp amp and duration at 2 nA and 2ms, respectively, as per Woodin et al. (2003). Plasticity induction parameters can be changed in promptWindow (Paired Synapses block). promptWindow defaults should generate the proper plasticity induction protocol.
