@@ -7,7 +7,7 @@
 
 	// built in parameters 
 		v_init            = -70     // mV												
-		tstop             = 100000  // ms  				FOR PLASTICITY INDUCTION PROTOCOL OF 20s														
+		tstop             = 10  // ms  				FOR PLASTICITY INDUCTION PROTOCOL OF 20s														
 		dt                = 0.025   // ms														
 		celsius           = 36      // C degrees										
 	// custom parameters 											from makeIons.hoc  
@@ -50,28 +50,28 @@
 			gl_soma 		= 0.001		// S/cm^2				
 			el_soma			= -70 		// mV
 		// chloride parameters											
-			axD_soma        = 10     	// um^2/ms 
+			axD_soma        = 2     	// um^2/ms  (http://www.nature.com/articles/srep23196; Kuner & Augustine Neuron 2000)
 	
 	// proximal dendritic section
 		// leak parameters
 			gl_prox 		= 0.001		// S/cm^2
 			el_prox			= -70 		// mV
 		// chloride parameters
-			axD_prox        = 10     	// um^2/ms 				 								
+			axD_prox        = 2     	// um^2/ms 				 								
 	
 	// middle dendritic section
 		// leak parameters
 			gl_mid  		= 0.001		// S/cm^2
 			el_mid			= -70 		// mV
 		// chloride parameters
-			axD_mid        = 10    		// um^2/ms 	 										
+			axD_mid        = 2    		// um^2/ms 	 										
 	
 	// distal dendritic section
 		// leak parameters
 			gl_dist  		= 0.001		// S/cm^2
 			el_dist			= -70 		// mV
 		// chloride parameters
-			axD_dist        = 10      	// um^2/ms 	 											
+			axD_dist        = 2      	// um^2/ms 	 											
 
 //-----------------------------------------------------------------------------
 // active ion channel parameters 									from .mod files {HH, cat, calL, calH} to makeActiveChannels.hoc
