@@ -2,21 +2,44 @@
 TITLE Model of KCC2 transport
 :------------------------------------------------------------------------------
 
+COMMENT
+----------------------------------------------------------------------------- 
+  This file models the KCC2 channel mechanism as a distributed process to
+  extrude intracellular chloride to baseline levels and increase chloride 
+  concentration in the presence of chloride currents.
+
+  A tonic GABA component is included to maintain chloride levels and is
+  equal but opposite to the initial extrusion rate of chloride ions.
+
+  The internal chloride ion concentration should be explicitly set in hoc 
+  after inserting KCC2 but before running using
+  "cli0_KCC2 = x"
+  else the default of 5 mM is used.
+
+  With special thanks to Blake Richards and lab 
+
+  Authors: Christopher Brian Currin, Joseph Valentino Raimondo
+
+  References:
+  - 
+-----------------------------------------------------------------------------
+ENDCOMMENT
 
 NEURON {
   SUFFIX KCC2_Transport
-  USEION k READ ki, ko VALENCE 1
   USEION cl READ icl, ecl, clo WRITE cli VALENCE -1
+  USEION k READ ki, ko VALENCE 1
   USEION mkcc2 READ mkcc2i VALENCE 1
   RANGE axD, gtonic, itonic
   RANGE R_T, r_T
   RANGE D, v_T, V_T, transport
+  RANGE efflux, Pa 
   GLOBAL celsius
 }
 
 UNITS {
-  (mV) = (millivolt)
-  (um) = (micron)
+    (mV) = (millivolt)
+    (um) = (micron)
   (mA) = (milliamp)
   (M)  = (1/liter)
   (mM) = (milliM)
@@ -28,9 +51,8 @@ UNITS {
 }
 
 PARAMETER {
+  Pa     = 1.9297e-5   (mA/(mM2*cm2))
   axD    = 1    (um2/ms) < 0, 1e9 > : axial chloride diffusion constant
-  R_T    = 29.8    (mM)     < 0, 1e9 > : Michaelis constant for KCC2 ion transport (Kd from Raimondo lab UCT)
-  r_T    = 5.07    (/s)     < 0, 1e9 > : rate of transport of KCC2-bound ions across the membrane (Note that r_T is essentially mM/s because we treat mkcc2i as an ion -- 5.07 from Raimondo lab UCT)
   gtonic = 1.7e-4      (S/cm2)  : tonic conductance
 }
 
@@ -47,9 +69,7 @@ ASSIGNED {
   celsius   (degC)   : temperature
   mkcc2i    (mM)     : concentration of membrane-bound KCC2
   D         ()     : KCC2 driving force direction
-  V_T       (mM/s)   : max rate of ion transport by KCC2
   v_T       (mM/s)   : rate of ion transport by KCC2
-  transport (mM/s)   : rate of ion transport accounting for direction
 }
 
 STATE {
@@ -60,9 +80,7 @@ STATE {
 INITIAL {
   itonic    = 0
   D         = 0
-  V_T       = 0
   v_T       = 0
-  transport = 0
 }
 
 BREAKPOINT {
@@ -71,34 +89,20 @@ BREAKPOINT {
 
 KINETIC state {
   tonicgaba(v,ecl)
-  transport_mm(cli, ki, mkcc2i,diam)
-  driveforce(cli, clo, ki, ko)
+  transport_mm(cli, clo, ki, ko, mkcc2i)
   
   COMPARTMENT                PI*diam*diam/4 { cli }
   LONGITUDINAL_DIFFUSION axD*PI*diam*diam/4 { cli }
   
   : synaptic chloride current - KCC2 efflux + tonic GABA current
-  ~ cli << ((1e4)*icl*diam*PI/F + (1e-3)*transport*PI*diam*diam/4 + (1e4)*itonic*diam*PI/F)
+  ~ cli << ((1e4)*icl*diam*PI/F - (1e4)*v_T*PI*diam/F + (1e4)*itonic*diam*PI/F)
 }
 
 PROCEDURE tonicgaba(Vm (mV), Em (mV)) {
   itonic = gtonic * (Vm - Em)
 }
 
-PROCEDURE transport_mm(Cint (mM), Kint (mM), Mkcc2int (mM), diam (um)) {
-  V_T = r_T*(Mkcc2int)
-  v_T = (12.76/diam)*V_T*Kint*Cint/((Kint + R_T)*(Cint + R_T))
+PROCEDURE transport_mm(Clint (mM), Clout (mM), Kint (mM), Kout (mM), Mkcc2int (mM)) {
+  v_T = Pa*(Kint*Clint-Kout*Clout)*(Mkcc2int)
 }
 
-PROCEDURE driveforce(Cint (mM), Cout (mM), Kint (mM), Kout (mM)) {
-  D = (Kout/Kint) - (Cint/Cout)
-  if (D > 0) {
-    transport = v_T
-  }
-  if (D < 0) {
-    transport = -v_T
-  }
-  if (D == 0) {
-    transport = 0
-  }
-}
