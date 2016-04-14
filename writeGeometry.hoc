@@ -1,0 +1,72 @@
+// write geometry 
+strdef geom_file, CA1geometry
+objref runfile
+
+PN = proximal_indices.size()
+MN = middle_indices.size()
+DN = distal_indices.size()
+
+
+objref soma_3d, prox_3d, midd_3d, dist_3d
+soma_3d = new Vector()
+prox_3d = new Vector()
+midd_3d = new Vector()
+dist_3d = new Vector()
+
+forsec somatic{
+	for j=0, n3d()-1{
+		soma_3d.append(0)
+		soma_3d.append(x3d(j))
+		soma_3d.append(y3d(j))
+		soma_3d.append(z3d(j))
+		soma_3d.append(diam3d(j))
+	}
+}
+
+
+forsec proximal{
+	for i = 1, PN-1{
+		for j=0, n3d()-1{
+			prox_3d.append(i)
+			prox_3d.append(x3d(j))
+			prox_3d.append(y3d(j))
+			prox_3d.append(z3d(j))
+			prox_3d.append(diam3d(j))
+		}
+	}
+}
+
+forsec middle{
+	for i = PN, PN+MN-1{
+		for j=0, n3d()-1{
+			midd_3d.append(i)
+			midd_3d.append(x3d(j))
+			midd_3d.append(y3d(j))
+			midd_3d.append(z3d(j))
+			midd_3d.append(diam3d(j))
+		}
+	}
+}
+
+forsec distal{
+	for i = PN+MN, PN+MN+DN-1{
+		for j=0, n3d()-1{
+			dist_3d.append(i)
+			dist_3d.append(x3d(j))
+			dist_3d.append(y3d(j))
+			dist_3d.append(z3d(j))
+			dist_3d.append(diam3d(j))
+		}
+	}
+}
+
+runfile = new File()  // ask on forum about this
+sprint(geom_file,"./CA1geometry.dat")  // ask on forum about this
+runfile.wopen(geom_file)  // ask on forum about this
+runfile.seek(0)  
+soma_3d.vwrite(runfile)
+prox_3d.vwrite(runfile)
+midd_3d.vwrite(runfile)
+dist_3d.vwrite(runfile)
+print "geometry written to file ", geom_file
+runfile.close()

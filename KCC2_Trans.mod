@@ -51,9 +51,9 @@ UNITS {
 }
 
 PARAMETER {
-  Pa     = 1.9297e-5   (mA/(mM2*cm2))
+  Pa     = 1.9297e-5   (mA/mM2/cm2)
   axD    = 1    (um2/ms) < 0, 1e9 > : axial chloride diffusion constant
-  gtonic = 1.7e-4      (S/cm2)  : tonic conductance
+  gtonic = 2.255e-6     (S/cm2)  : tonic conductance
 }
 
 ASSIGNED {

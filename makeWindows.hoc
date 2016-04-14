@@ -186,19 +186,19 @@ objectvar save_window
 //	save_window.addexpr("soma.phos_active_KCC2( 0.0454545 )", 3, 1, 0.8, 0.9, 2)
 //	}
 //
-//// make the shape plot for chloride
-//	{
-//	save_window = new PlotShape(0)
-//	save_window.size(-245.449,315.449,-160,330)
-//	save_window.variable("cli")
-//	{save_window.view(-245.449, -160, 560.898, 490, 1200, 300, 350.4, 304.96)}
-//	fast_flush_list.append(save_window)
-//	save_window.save_name("fast_flush_list.")
-//	save_window.exec_menu("Shape Plot")
-//	save_window.exec_menu("Show Diam")
-//	save_window.exec_menu("View = plot")
-//	save_window.scale(8,20)
-//	}
+// make the shape plot for chloride
+	{
+	save_window = new PlotShape(0)
+	save_window.size(-245.449,315.449,-160,330)
+	save_window.variable("cli")
+	{save_window.view(-245.449, -160, 560.898, 490, 1200, 300, 350.4, 304.96)}
+	fast_flush_list.append(save_window)
+	save_window.save_name("fast_flush_list.")
+	save_window.exec_menu("Shape Plot")
+	save_window.exec_menu("Show Diam")
+	save_window.exec_menu("View = plot")
+	save_window.scale(3.999,4.5)
+	}
 //
 //// make the shape plot for voltage
 //	{

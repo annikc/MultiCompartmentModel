@@ -13,6 +13,7 @@ use_mcell_ran4(0)
 xopen("setParameters.hoc")
 xopen("makeCell.hoc")
 xopen("makeWindows.hoc")
+xopen("writeGeometry.hoc")
 
 
 strdef filename, fprefix
