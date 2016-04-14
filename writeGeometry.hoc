@@ -6,67 +6,97 @@ PN = proximal_indices.size()
 MN = middle_indices.size()
 DN = distal_indices.size()
 
-
-objref soma_3d, prox_3d, midd_3d, dist_3d
+objref header
+header = new Vector()
+objref soma_3d, prox_3d, midd_3d, dist_3d, morpho
 soma_3d = new Vector()
 prox_3d = new Vector()
 midd_3d = new Vector()
 dist_3d = new Vector()
+morpho = new Vector()
 
+i = 0 
 forsec somatic{
 	for j=0, n3d()-1{
+		soma_3d.append(i)
 		soma_3d.append(0)
 		soma_3d.append(x3d(j))
 		soma_3d.append(y3d(j))
 		soma_3d.append(z3d(j))
 		soma_3d.append(diam3d(j))
 	}
+	i = i + 1 
 }
 
-
+i = 1
 forsec proximal{
-	for i = 1, PN-1{
-		for j=0, n3d()-1{
-			prox_3d.append(i)
-			prox_3d.append(x3d(j))
-			prox_3d.append(y3d(j))
-			prox_3d.append(z3d(j))
-			prox_3d.append(diam3d(j))
-		}
+	for j=0, n3d()-1{
+		prox_3d.append(i)
+		prox_3d.append(proximal_indices.x(i-1))
+		prox_3d.append(x3d(j))
+		prox_3d.append(y3d(j))
+		prox_3d.append(z3d(j))
+		prox_3d.append(diam3d(j))
 	}
+	i = i + 1
 }
 
+i = PN
 forsec middle{
-	for i = PN, PN+MN-1{
-		for j=0, n3d()-1{
-			midd_3d.append(i)
-			midd_3d.append(x3d(j))
-			midd_3d.append(y3d(j))
-			midd_3d.append(z3d(j))
-			midd_3d.append(diam3d(j))
-		}
+	for j=0, n3d()-1{
+		midd_3d.append(i)
+		midd_3d.append(middle_indices.x(i-PN))
+		midd_3d.append(x3d(j))
+		midd_3d.append(y3d(j))
+		midd_3d.append(z3d(j))
+		midd_3d.append(diam3d(j))
 	}
+	i = i + 1
 }
 
+i = PN+MN
 forsec distal{
-	for i = PN+MN, PN+MN+DN-1{
-		for j=0, n3d()-1{
-			dist_3d.append(i)
-			dist_3d.append(x3d(j))
-			dist_3d.append(y3d(j))
-			dist_3d.append(z3d(j))
-			dist_3d.append(diam3d(j))
-		}
+	for j=0, n3d()-1{
+		dist_3d.append(i)
+		dist_3d.append(distal_indices.x(i-(PN+MN)))
+		dist_3d.append(x3d(j))
+		dist_3d.append(y3d(j))
+		dist_3d.append(z3d(j))
+		dist_3d.append(diam3d(j))
 	}
+	i = i + 1
 }
+
+
+morpho.resize(0)
+for i = 0, soma_3d.size()-1{
+	morpho.append(soma_3d.x(i))
+}
+for i = 0, prox_3d.size()-1{
+	morpho.append(prox_3d.x(i))
+}
+for i = 0, midd_3d.size()-1{
+	morpho.append(midd_3d.x(i))
+}
+for i = 0, dist_3d.size()-1{
+	morpho.append(dist_3d.x(i))
+}
+
+header.resize(0)
+header.append(1) // number of items in sectionlist 'somatic'
+header.append(PN)// number of items in sectionlist 'proximal'
+header.append(MN)// number of items in sectionlist 'middle'
+header.append(DN)// number of items in sectionlist 'distal'
+header.append(morpho.size())
+
+
 
 runfile = new File()  // ask on forum about this
 sprint(geom_file,"./CA1geometry.dat")  // ask on forum about this
 runfile.wopen(geom_file)  // ask on forum about this
 runfile.seek(0)  
-soma_3d.vwrite(runfile)
-prox_3d.vwrite(runfile)
-midd_3d.vwrite(runfile)
-dist_3d.vwrite(runfile)
+header.vwrite(runfile)
+morpho.vwrite(runfile)
 print "geometry written to file ", geom_file
 runfile.close()
+
