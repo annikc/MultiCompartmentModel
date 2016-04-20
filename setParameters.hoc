@@ -7,7 +7,7 @@
 
 	// built in parameters 
 		v_init            = -70     // mV												
-		tstop             = 10000  // ms  				FOR PLASTICITY INDUCTION PROTOCOL OF 20s														
+		tstop             = 100000  // ms  				FOR PLASTICITY INDUCTION PROTOCOL OF 20s														
 		dt                = 0.025   // ms														
 		celsius           = 36      // C degrees										
 	// custom parameters 											from makeIons.hoc  
