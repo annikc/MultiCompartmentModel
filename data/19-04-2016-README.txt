@@ -1,0 +1,10 @@
+data collected from simulations run on SciNet system April 15-18 2016.
+
+KCC2 extrusion scaled by volume. 
+
+Cl- diffusion constant changed from 10um^2/ms (as used in single compartment simulations to homogenize Cl across segments) to 2 um^2/ms  (from http://www.nature.com/articles/srep23196; Kuner & Augustine Neuron 2000)
+
+Files used for data collection can be found at: https://github.com/annikc/MultiCompartmentModel/tree/KCC2vol
+
+
+README last updated: APR 19, 2016
