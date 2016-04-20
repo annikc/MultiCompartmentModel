@@ -16,9 +16,7 @@ COMMENT
   "cli0_KCC2 = x"
   else the default of 5 mM is used.
 
-  With special thanks to Blake Richards and lab 
-
-  Authors: Christopher Brian Currin, Joseph Valentino Raimondo
+  Authors: Blake Richards, Annik Yalnizyan-Carson, Christopher Brian Currin, Joseph Valentino Raimondo
 
   References:
   - 
@@ -53,7 +51,7 @@ UNITS {
 PARAMETER {
   Pa     = 1.9297e-5   (mA/mM2/cm2)
   axD    = 1    (um2/ms) < 0, 1e9 > : axial chloride diffusion constant
-  gtonic = 2.11107e-6     (S/cm2)  : tonic conductance
+  gtonic = 2.1115e-6     (S/cm2)  : tonic conductance
 }
 
 ASSIGNED {
