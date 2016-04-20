@@ -1,6 +1,10 @@
 import btmorph
 import numpy
 import matplotlib.pyplot as plt
+import morphometricdata
+
+cell_1 = geomReader("./CA1geometry.dat")
+morpho = cell_1.data_vec
 
 swc_tree= btmorph.STree2()
 swc_tree.read_SWC_tree_from_file("./n123.swc")

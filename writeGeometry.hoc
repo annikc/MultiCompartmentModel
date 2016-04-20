@@ -16,53 +16,89 @@ dist_3d = new Vector()
 morpho = new Vector()
 
 i = 0 
+k = -1 
 forsec somatic{
+	k = -1 
 	for j=0, n3d()-1{
+		// Marker for python to know how to connect sections  
+		soma_3d.append(k)
+		// assign new index for python 3d info (soma index = 0) 
 		soma_3d.append(i)
-		soma_3d.append(0)
+		// include NEURON's section number (soma == 0 ) 
+		soma_3d.append(999)
+		// write spatial information for each segment in the section 
 		soma_3d.append(x3d(j))
 		soma_3d.append(y3d(j))
 		soma_3d.append(z3d(j))
 		soma_3d.append(diam3d(j))
+		// increase counter for connection info 
+		k = k + 1
+		soma_3d.append(k) 
 	}
 	i = i + 1 
 }
 
 i = 1
 forsec proximal{
+	l = -1 
 	for j=0, n3d()-1{
-		prox_3d.append(i)
-		prox_3d.append(proximal_indices.x(i-1))
+		// Marker for python to know how to connect sections 
+		prox_3d.append(l) 
+		// assign new index for python 3d info (proximal indices 1 - 18)
+		prox_3d.append(i) 
+		// include NEURON's section numbers for dend[x] in sectionList proximal
+		prox_3d.append(proximal_indices.x(i-1)) 
+		// write spatial information for each segment in the section 
 		prox_3d.append(x3d(j))
 		prox_3d.append(y3d(j))
 		prox_3d.append(z3d(j))
 		prox_3d.append(diam3d(j))
+		l = l + 1
+		prox_3d.append(l)
 	}
 	i = i + 1
 }
 
-i = PN
+i = PN + 1 
 forsec middle{
+	m = -1
 	for j=0, n3d()-1{
+		// Marker for python to know how to connect sections 
+		midd_3d.append(m)
+		// assign new index for python 3d info (middle indices = 19 - 122)  
 		midd_3d.append(i)
-		midd_3d.append(middle_indices.x(i-PN))
+		// include NEURON's section numbers for dend[x] in sectionList middle 
+		midd_3d.append(middle_indices.x(i-(PN+1)))
+		// write spatial information for each segment in the section 
 		midd_3d.append(x3d(j))
 		midd_3d.append(y3d(j))
 		midd_3d.append(z3d(j))
 		midd_3d.append(diam3d(j))
+		// increase counter for connection info 
+		m = m + 1
+		midd_3d.append(m)
 	}
 	i = i + 1
 }
 
-i = PN+MN
+i = PN+MN + 1 
 forsec distal{
+	n = -1
 	for j=0, n3d()-1{
+		// Marker for python to know how to connect sections 
+		dist_3d.append(n)
+		// assign new index for python 3d info (distal indices = 123 - 180)
 		dist_3d.append(i)
-		dist_3d.append(distal_indices.x(i-(PN+MN)))
+		// include NEURON's section numbers for dend[x] in sectionList distal
+		dist_3d.append(distal_indices.x(i-(PN+MN+1)))
+		// write spatial information for each segment in the section 
 		dist_3d.append(x3d(j))
 		dist_3d.append(y3d(j))
 		dist_3d.append(z3d(j))
 		dist_3d.append(diam3d(j))
+		// increase counter for connection info 
+		n = n + 1
+		dist_3d.append(n) 
 	}
 	i = i + 1
 }

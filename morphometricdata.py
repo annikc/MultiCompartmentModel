@@ -39,52 +39,29 @@ class geomReader:
 		return num_items
 
 
-	def read_data(self):   # N adds num_samp and precision before every instantiation of a vector ***
-		samp = struct.unpack('i', self.file.read(4))[0]
-		precision = struct.unpack('i', self.file.read(4))[0]
-		
-		# Set the right number of bytes per data point
-		if precision == 1:
-			num_bytes = 1
-			val_type = 'c'
-		elif precision == 2:
-			num_bytes = 2
-			val_type = 'h'
-		elif precision == 3:
-			num_bytes = 4
-			val_type = 'f'
-		elif precision == 4:
-			num_bytes = 8
-			val_type = 'd'
-		
-		else: 
-			print "SAMPLE OR PRECISION ERROR"
-
-		print "Num bytes ", num_bytes
-		print "val type ", val_type
-
-		return (num_bytes, val_type)
-
-
 	def morpho_data(self, num_items):
 		self.file.seek(8,1)
 		
-		entries = (num_items)/6
-		print entries
-		data_array = np.zeros((entries, 6))
+		entries = (num_items)/8
+		print "number of entries", entries
+		data_array = np.zeros((entries, 8))
 
-		for i in range(100):
-			for j in range(6):
+		for i in range(entries):
+			for j in range(8):
 				data_value = struct.unpack('d', self.file.read(8))[0]
 				data_array[i, j] = data_value
 			#print data_array[i, :]
 
-		geometry = np.delete(data_array, 1, axis=1)
-
-		#print data_array[0:10, :]
+		'''
+		NEED TO FIX geometry to have only necessary info -- no NEURON indices
+		'''
+		geometry = np.delete(data_array, 2, axis=1)
+		section_connection = np.delete(data_array, [3,4,5,6], axis=1 )
+		
+		#print section_connection[0:100, :]
 		#print geometry[0:10, :]
 
-		return geometry
+		return data_array
 
 
 
@@ -138,7 +115,7 @@ def save(path, ext='png', close=True, verbose=True):
     if verbose:
         print("Done")
 
-cell_1 = geomReader("./CA1geometry.dat")
+#cell_1 = geomReader("./CA1geometry.dat")
 
 
 
