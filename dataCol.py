@@ -11,7 +11,7 @@ from readNRNdata import *
 # Read in Data
 ##############################################
 # Set up vector of STDP spike timing interval values used during data collection
-timesteps = np.array([-50, -25, -15, -10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5])
+timesteps = np.array([-50, -25, -15, -10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10, 15, 25, 50])
 
 # set up vector of dendrites in sectionlists Proximal, middle, and distal
 prox_seclist = np.array([0, 1, 2, 3, 5, 6, 7, 8, 9, 29, 42, 43, 44, 45, 46, 47, 54, 56])
@@ -25,10 +25,10 @@ midd_syn = []
 dist_syn = []
 
 for i in range(len(timesteps)):
-	soma_syn.append(nrnReader("../../../../../msc/SciNet/data/coarseExpts/soma_{0}.dat".format(timesteps[i])))
-	prox_syn.append(nrnReader("../../../../../msc/SciNet/data/coarseExpts/proximal_{0}.dat".format(timesteps[i])))
-	midd_syn.append(nrnReader("../../../../../msc/SciNet/data/coarseExpts/middle_{0}.dat".format(timesteps[i])))
-	dist_syn.append(nrnReader("../../../../../msc/SciNet/data/coarseExpts/distal_{0}.dat".format(timesteps[i])))
+	soma_syn.append(nrnReader("./data/coarseExpts/soma_{0}.dat".format(timesteps[i])))
+	prox_syn.append(nrnReader("./data/coarseExpts/proximal_{0}.dat".format(timesteps[i])))
+	midd_syn.append(nrnReader("./data/coarseExpts/middle_{0}.dat".format(timesteps[i])))
+	dist_syn.append(nrnReader("./data/coarseExpts/distal_{0}.dat".format(timesteps[i])))
 
 num_var = soma_syn[0].num_variables
 
@@ -166,14 +166,14 @@ midd_ecl = np.zeros(len(timesteps))
 dist_ecl = np.zeros(len(timesteps))
 
 for i in range(len(timesteps)):
-	#soma_ecl[i] = soma_syn[i].var_list.varList[0].secList[0]
+	soma_ecl[i] = soma_syn[i].var_list.varList[0].secList[0]
 	prox_ecl[i] = prox_syn[i].var_list.varList[0].secList[1][0]  #<name of file read in>.<list of variables>[Ecl=0/KCC2=1/Ca=2/Kin=3/phos=4].<list of sections>[soma=0/prox=1/midd=2/dist=3] 
 	##### NOTE: secList indices 1,2,3 contain vectors with recordings from all sections ... how do we want to organize this data?
-	#midd_ecl[i] = midd_syn[i].var_list.varList[0].secList[2]
-	#dist_ecl[i] = dist_syn[i].var_list.varList[0].secList[3]
+	midd_ecl[i] = midd_syn[i].var_list.varList[0].secList[2][0]
+	dist_ecl[i] = dist_syn[i].var_list.varList[0].secList[3][0]
 
-	#print prox_ecl[i]
-
+	print prox_ecl[i]
+print len(prox_syn[i].var_list.varList[0].secList[1])
 #LTtype_cyt_1 = np.zeros(1200)
 #for i in range(1201):
 #	LTtype_cyt_1[i-1] = LT_pos1_KCC2.var_data[0][i+20000]
