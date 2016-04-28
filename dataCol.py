@@ -172,13 +172,6 @@ for i in range(len(timesteps)):
 	midd_ecl[i] = midd_syn[i].var_list.varList[0].secList[2][0]
 	dist_ecl[i] = dist_syn[i].var_list.varList[0].secList[3][0]
 
-	print prox_ecl[i]
-print len(prox_syn[i].var_list.varList[0].secList[1])
-#LTtype_cyt_1 = np.zeros(1200)
-#for i in range(1201):
-#	LTtype_cyt_1[i-1] = LT_pos1_KCC2.var_data[0][i+20000]
-#
-
 ###########################################
 # Membrane Phosphorylated KCC2 (proportion)
 ###########################################
@@ -187,62 +180,54 @@ prox_MP = np.zeros(len(timesteps))
 midd_MP = np.zeros(len(timesteps))
 dist_MP = np.zeros(len(timesteps))
 
-#for i in range(len(timesteps)):
-	#soma_MP[i] = soma_syn[i].var_list.varList[1].secList[0]
-	#prox_MP[i] = prox_syn[i].var_list.varList[1].secList[1]  #<name of file read in>.<list of variables>[Ecl=0/KCC2=1/Ca=2/Kin=3/phos=4].<list of sections>[soma=0/prox=1/midd=2/dist=3]
-	#midd_MP[i] = midd_syn[i].var_list.varList[1].secList[2]
-	#dist_MP[i] = dist_syn[i].var_list.varList[1].secList[3]
+for i in range(len(timesteps)):
+	soma_MP[i] = soma_syn[i].var_list.varList[1].secList[0]
+	prox_MP[i] = prox_syn[i].var_list.varList[1].secList[1]  #<name of file read in>.<list of variables>[Ecl=0/KCC2=1/Ca=2/Kin=3/phos=4].<list of sections>[soma=0/prox=1/midd=2/dist=3]
+	midd_MP[i] = midd_syn[i].var_list.varList[1].secList[2]
+	dist_MP[i] = dist_syn[i].var_list.varList[1].secList[3]
 
-	#print prox_ecl[i]
 
 ###########################################
 # Calcium Concentration
 ###########################################
+soma_cal = np.zeros(len(timesteps))
+prox_cal = np.zeros(len(timesteps))
+midd_cal = np.zeros(len(timesteps))
+dist_cal = np.zeros(len(timesteps))
 
+for i in range(len(timesteps)):
+	soma_cal[i] = soma_syn[i].var_list.varList[1].secList[0]
+	prox_cal[i] = prox_syn[i].var_list.varList[1].secList[1]  #<name of file read in>.<list of variables>[Ecl=0/KCC2=1/Ca=2/Kin=3/phos=4].<list of sections>[soma=0/prox=1/midd=2/dist=3]
+	midd_cal[i] = midd_syn[i].var_list.varList[1].secList[2]
+	dist_cal[i] = dist_syn[i].var_list.varList[1].secList[3]
 
 ###########################################
 # Active Kinase (proportion)
 ###########################################
+soma_kin = np.zeros(len(timesteps))
+prox_kin = np.zeros(len(timesteps))
+midd_kin = np.zeros(len(timesteps))
+dist_kin = np.zeros(len(timesteps))
 
+for i in range(len(timesteps)):
+	soma_kin[i] = soma_syn[i].var_list.varList[1].secList[0]
+	prox_kin[i] = prox_syn[i].var_list.varList[1].secList[1]  #<name of file read in>.<list of variables>[Ecl=0/KCC2=1/Ca=2/Kin=3/phos=4].<list of sections>[soma=0/prox=1/midd=2/dist=3]
+	midd_kin[i] = midd_syn[i].var_list.varList[1].secList[2]
+	dist_kin[i] = dist_syn[i].var_list.varList[1].secList[3]
 
 ###########################################
 # Active Phosphatase (proportion)
 ###########################################
+soma_phos = np.zeros(len(timesteps))
+prox_phos = np.zeros(len(timesteps))
+midd_phos = np.zeros(len(timesteps))
+dist_phos = np.zeros(len(timesteps))
+
+for i in range(len(timesteps)):
+	soma_phos[i] = soma_syn[i].var_list.varList[1].secList[0]
+	prox_phos[i] = prox_syn[i].var_list.varList[1].secList[1]  #<name of file read in>.<list of variables>[Ecl=0/KCC2=1/Ca=2/Kin=3/phos=4].<list of sections>[soma=0/prox=1/midd=2/dist=3]
+	midd_phos[i] = midd_syn[i].var_list.varList[1].secList[2]
+	dist_phos[i] = dist_syn[i].var_list.varList[1].secList[3]
 
 
 
-
-#f, axarr = plt.subplots(4, sharex=True)
-##### Plot Python generated data
-## Plot Ka - Pa i.e. total phosphorylation activity
-#axarr[0].plot(LTtype_cyt_1, c=(0,1.0,0))
-#axarr[0].plot(Ttype_cyt_1, c=(0,0.8,0), ls='--')
-#axarr[0].plot(Ltype_cyt_1, c=(0,0.6,0), ls=':')
-##axarr[0].set_xlim([1e-8, 0.0000012])
-##axarr[0].set_ylim([0.799, 0.804])
-#axarr[0].set_ylabel('KCC2$_{C}$ (%)')
-#
-## Plot CaDRC for Cytoplasmic KCC2 
-#axarr[1].plot(LTtype_memb_1, c=(0,0,1.0))
-#axarr[1].plot(Ttype_memb_1, c=(0,0,0.8), ls='--')
-#axarr[1].plot(Ltype_memb_1, c=(0,0,0.6), ls=':')
-#axarr[1].set_ylim([0.136, 0.146])
-#axarr[1].set_ylabel('KCC2$_{M}$ (%)')
-## Plot CaDRC for Membrane Unphosphorylated KCC2
-#axarr[2].plot(LTtype_membp_1, c=(1.0, 0, 0), label="L- and T-type")
-#axarr[2].plot(Ttype_membp_1, c=(0.8, 0, 0), ls="--", label="T-type")
-#axarr[2].plot(Ltype_membp_1, c=(0.6, 0, 0), ls=":", label="L-type")
-#axarr[2].set_ylim([0.045, 0.065])
-#axarr[2].set_ylabel('KCC2$_{M_{P}}$ (%)')
-## Plot CaDRC for Membrane Phosphorylated KCC2
-#axarr[3].plot(LTtype_volt_1, c=(0,0,0))
-#axarr[3].set_ylim([-90, 20])
-#axarr[3].set_ylabel('Voltage (mV)')
-#plt.legend(loc=0)
-#f.text(0.5, 0.03, '$t$ (ms)', ha='center')
-#
-#
-#################################################
-## save graphs
-##save("../../Thesis/fig/KCC2voltage_trace_1", ext="png", close=True, verbose=True)
-#plt.show()

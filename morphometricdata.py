@@ -26,15 +26,15 @@ class geomReader:
 	def read_header(self):
 		self.file.seek(8,0)
 		self.num_somatic = int(struct.unpack('d', self.file.read(8))[0])
-		print "Number of Sections in SectionList 'Somatic' ", self.num_somatic
+		#print "Number of Sections in SectionList 'Somatic' ", self.num_somatic
 		self.num_proximal = int(struct.unpack('d', self.file.read(8))[0])
-		print "Number of Sections in SectionList 'Proximal' ", self.num_proximal
+		#print "Number of Sections in SectionList 'Proximal' ", self.num_proximal
 		self.num_middle = int(struct.unpack('d', self.file.read(8))[0])
-		print "Number of Sections in SectionList 'Middle' ", self.num_middle
+		#print "Number of Sections in SectionList 'Middle' ", self.num_middle
 		self.num_distal = int(struct.unpack('d', self.file.read(8))[0])
-		print "Number of Sections in SectionList 'Distal' ", self.num_distal
+		#print "Number of Sections in SectionList 'Distal' ", self.num_distal
 		num_items = int(struct.unpack('d', self.file.read(8))[0])
-		print "Number of Items in Geometry Output ", num_items
+		#print "Number of Items in Geometry Output ", num_items
 
 		return num_items
 
@@ -43,7 +43,7 @@ class geomReader:
 		self.file.seek(8,1)
 		
 		entries = (num_items)/8
-		print "number of entries", entries
+		#print "number of entries", entries
 		data_array = np.zeros((entries, 8))
 
 		for i in range(entries):
