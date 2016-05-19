@@ -1,0 +1,4 @@
+# git ignore files:
+
+*.py
+*.pyc
