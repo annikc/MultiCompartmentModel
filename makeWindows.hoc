@@ -272,4 +272,3 @@ objectvar save_window
 // update all the panels
 objectvar scene_vector_[1]
 {doNotify()}
-
