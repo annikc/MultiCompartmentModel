@@ -11,7 +11,7 @@ objectvar save_window
 
 //Set Default Labels
 strdef location_paired_string
-location_paired_string = "    Distal Dendrites"
+location_paired_string = "    Default = Proximal Dendrites"
 
 strdef location_unpaired_string
 location_unpaired_string = "    Soma"
@@ -140,7 +140,7 @@ hbox = new HBox(0)
 hbox.intercept(1)
 xpanel("Specify Parameters")
 	xlabel("PAIRED SYNAPSES")
-		location_paired_prompt = 3
+		location_paired_prompt = 1
 		xmenu("Location of Paired Synapses") 
 			xradiobutton("Soma", "set_location_paired(0)")
 			xradiobutton("Proximal Dendrite", "set_location_paired(1)")
@@ -149,7 +149,7 @@ xpanel("Specify Parameters")
 		xmenu()
 	 	xvarlabel(location_paired_string) 
 
-		density_paired_prompt = 0.01
+		density_paired_prompt = 0.1334
 		xvalue("Density of Paired Synapses","density_paired_prompt", 1)
 		
 		interval_paired_prompt = 200
