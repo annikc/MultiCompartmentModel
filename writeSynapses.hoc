@@ -1,0 +1,25 @@
+// write synapses 
+strdef syn_file, CA1synapses
+objref runfile
+
+
+objref header
+header = new Vector()
+
+
+header.resize(0)
+header.append(GABA_count) 
+header.append(scts)
+header.append(syn_location)
+
+
+
+runfile = new File()  // ask on forum about this
+sprint(syn_file,"./CA1synapses.dat")  // ask on forum about this
+runfile.wopen(syn_file)  // ask on forum about this
+runfile.seek(0)  
+header.vwrite(runfile)
+morpho.vwrite(runfile)
+print "synapses written to file ", syn_file
+runfile.close()
+
