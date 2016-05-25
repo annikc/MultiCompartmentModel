@@ -16,6 +16,7 @@ prox = 0.1334 / um^2
 midd = 0.009 / um^2
 dist = 0.0025 / um^2
 ```
+By default synapses are in the proximal dendrites. 
 
 Start of Paried Synapse Spikes determines the onset of plasticity induction. 
 Paired synapses are GABAergic synapses which are pseudo-randomly distributed (per random synapse distribution seed, by default set as 37264 for no particular reason). They are "paired" with current clamp activity -- i.e. the clamp is set to start within some delta_t of the start of paired synapse spikes. (The delta_t value, inconveniently, is set in the mosinit files, in the procedure add_timestep().)
