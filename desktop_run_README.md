@@ -70,6 +70,6 @@ promptWindow.hoc
 ### Running Simulations of the Cell
 Clicking "Create Cell" will generate all of the windows necessary to play with the model specified by the user in the promptWindow. Simulation is run from RunControl window. 
 
-By default, plasticity induction is started ~ 10000s after the simulation begins, and is carried out at 5Hz for 30000 ms with clamp amp and duration at 3nA and 5ms, respectively, modified from Woodin et al. (2003). Plasticity induction parameters can be changed in promptWindow (Paired Synapses block). promptWindow defaults should generate the proper plasticity induction protocol. (*May 25, 2016: Currently promptWindow defaults are not set to these values. Will be updated ASAP*)
+By default, plasticity induction is started ~ 10000s after the simulation begins, and is carried out at 5Hz for 30000 ms with clamp amp and duration at 3nA and 5ms, respectively (this protocol is a modified version of the plasticity induction protocol presented in Woodin et al., 2003). Plasticity induction parameters can be changed in promptWindow (Paired Synapses block). promptWindow defaults should generate the proper plasticity induction protocol.
 
 Most other relevant parameters can be changed in setParameters.hoc. Changes to any hoc files can be implemented by clicking "Create Cell" again, without quitting NEURON all together. Changes to any mod files will require fully exiting NEURON, recompiling code (with *nrnivmodl* for Linux/UNIX or Mac, or the *mknrndll* applet with Windows), and reopening promptWindow.hoc. 
