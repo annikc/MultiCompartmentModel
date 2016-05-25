@@ -202,16 +202,16 @@ xpanel("Specify Parameters")
 		xlabel("       ")
 
 	xlabel("CURRENT CLAMP")
-		clamp_amp_prompt = 2
+		clamp_amp_prompt = 3
 		xvalue("Current Clamp Amp","clamp_amp_prompt", 1)
 		
-		clamp_dur_prompt = 2
+		clamp_dur_prompt = 5
 		xvalue("Current Clamp Duration","clamp_dur_prompt", 1)
 
 		clamp_int_prompt = interval_paired_prompt
 		xvalue("Interval Between Current Clamp Events","clamp_int_prompt", 1)
 		
-		clamp_num_prompt = 0
+		clamp_num_prompt = number_paired_prompt
 		xvalue("Number of Current Clamp Events","clamp_num_prompt", 1)
 
 		clamp_noise_prompt = 0
