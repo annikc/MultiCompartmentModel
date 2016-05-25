@@ -2,7 +2,7 @@
 
 Last updated: May 20, 2016
 
-Simulations can be run on desktop by opening the nrngui and loading the hoc file 
+Before opening nrngui, make sure to compile code. Simulations can be run on desktop by opening the nrngui and loading the hoc file 
 ```
 promptWindow.hoc
 ```
@@ -42,7 +42,9 @@ Number of Clamp events = 150
 Change only if you want new synapse distribution. The default number is totally random.
 
 ### Record data
-Checking the "Record Data" box is not recommended for desktop simulation runs. This causes "Create Cell" to call mosinit.hoc, which calls for significant memory allocation to record variables after the simulation run. Leaving "Record Data" unchecked calls mosinit_RUNonly.hoc, which does not require any memory allocation. Aside from data recording, mosinit.hoc and mosinit_RUNonly.hoc are identical in the hoc files they call. The tree is as follows: 
+Checking the "Record Data" box is not recommended for desktop simulation runs. This causes "Create Cell" to call mosinit.hoc, which calls for significant memory allocation to record variables after the simulation run. Leaving "Record Data" unchecked calls mosinit_RUNonly.hoc, which does not require any memory allocation. Aside from data recording, mosinit.hoc and mosinit_RUNonly.hoc are identical in the hoc files they call. 
+
+The tree is as follows: 
 ```
 promptWindow.hoc
 	mosinit_RUNonly.hoc (or mosinit.hoc)
@@ -55,6 +57,10 @@ promptWindow.hoc
 			makePairedUnpaired.hoc
 		makeWindows.hoc
 ```
-This should generate all of the windows necessary to play with the model. 
 
-Simulation is run from RunControl window. Plasticity induction is started ~ 10000s after the simulation begins, and is carried out at 5Hz for 30000 ms with clamp amp and duration at 2 nA and 2ms, respectively, as per Woodin et al. (2003). Plasticity induction parameters can be changed in promptWindow (Paired Synapses block). promptWindow defaults should generate the proper plasticity induction protocol.
+### Running Simulations of the Cell
+Clicking "Create Cell" will generate all of the windows necessary to play with the model specified by the user in the promptWindow. Simulation is run from RunControl window. 
+
+By default, plasticity induction is started ~ 10000s after the simulation begins, and is carried out at 5Hz for 30000 ms with clamp amp and duration at 3nA and 5ms, respectively, modified from Woodin et al. (2003). Plasticity induction parameters can be changed in promptWindow (Paired Synapses block). promptWindow defaults should generate the proper plasticity induction protocol. (*May 25, 2016: Currently promptWindow defaults are not set to these values. Will be updated ASAP*)
+
+Most other relevant parameters can be changed in setParameters.hoc. Changes to any hoc files can be implemented by clicking "Create Cell" again, without quitting NEURON all together. Changes to any mod files will require fully exiting NEURON, recompiling code (with *nrnivmodl* for Linux/UNIX or Mac, or the *mknrndll* applet with Windows), and reopening promptWindow.hoc. 
