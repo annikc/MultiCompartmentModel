@@ -1,6 +1,6 @@
 # MultiCompartmentModel
 
-Last updated: May 20, 2016
+Last updated: May 25, 2016
 
 Before opening nrngui, make sure to compile code. Simulations can be run on desktop by opening the nrngui and loading the hoc file 
 ```
