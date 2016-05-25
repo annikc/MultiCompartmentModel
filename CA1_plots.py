@@ -1,5 +1,6 @@
 import math
-from morphometricdata import *
+from readGEOMinfo import *
+from readSYNinfo import *
 from readNRNdata import * 
 from collections import defaultdict
 from numpy import mean,cov,double,cumsum,dot,linalg,array,rank
@@ -13,19 +14,40 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import pdb
 
-'''
-INCLUDE VISUALIZATION OF SYNAPSES 
-''' 
 
+def data_types(Ktype, Ctype):
+	if Ktype == 0 and Ctype == 0:
+		KCC2_type = 'vol'
+		Ca_Type = 'LT' 
+		ca_channel_string = "L- and T-Type Calcium Channels"
+	elif Ktype == 1 and Ctype == 0:
+		KCC2_type = 'SA'
+		Ca_Type = 'LT' 
+		ca_channel_string = "L- and T-Type Calcium Channels"
+	elif Ktype == 0 and Ctype == 1:
+		KCC2_type = 'vol'
+		Ca_Type = 'T_only'
+		ca_channel_string = "T-Type Channels Only"
+	elif Ktype == 1 and Ctype == 1:
+		KCC2_type = 'SA'
+		Ca_Type = 'T_only'
+		ca_channel_string = "T-Type Channels Only"
 
+	return (KCC2_type, Ca_Type, ca_channel_string)
+
+ktype_picker = 1
+catype_picker = 0
+
+KCC2_type = data_types(ktype_picker,catype_picker)[0]
+Ca_Type = data_types(ktype_picker,catype_picker)[1]
+ca_channel_string = data_types(ktype_picker,catype_picker)[2]
+#KCC2_type = 'vol'
+#Ca_Type = 'LT'
 ##############################################
 # Read in Data
 ##############################################
 np.set_printoptions(suppress=True)
 
-# Set up vector of STDP spike timing interval values used during data collection
-coarse_timesteps = np.array([-50, -25, -15, -10, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 10, 15, 25, 50])
-fine_timesteps = np.arange(-5, 5.1, 0.1)
 # set up vector of dendrites in sectionlists Proximal, middle, and distal
 prox_seclist = np.array([0, 1, 2, 3, 5, 6, 7, 8, 9, 29, 42, 43, 44, 45, 46, 47, 54, 56])
 midd_seclist = np.array([4, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 48, 49, 50, 51, 52, 53, 55, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 139, 140, 141, 142, 147, 150, 151, 154, 155, 156, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 174, 175, 176, 177, 178, 179])
@@ -37,89 +59,146 @@ prox_syn = []
 midd_syn = []
 dist_syn = []
 
-for i in range(len(coarse_timesteps)):
-	soma_syn.append(nrnReader("./data/KCC2_vol/coarseExpts/soma_{0}.dat".format(coarse_timesteps[i])))
-	prox_syn.append(nrnReader("./data/KCC2_vol/coarseExpts/proximal_{0}.dat".format(coarse_timesteps[i])))
-	midd_syn.append(nrnReader("./data/KCC2_vol/coarseExpts/middle_{0}.dat".format(coarse_timesteps[i])))
-	dist_syn.append(nrnReader("./data/KCC2_vol/coarseExpts/distal_{0}.dat".format(coarse_timesteps[i])))
+def get_data(delta_t_array):
+	T_vals = []
+	if delta_t_array == 0: 
+		coarse_array = np.arange(-50, 51)
+		for j in range(len(coarse_array)):
+			T_vals.append(int(coarse_array[j]))
+		for i in range(len(coarse_array)):
+			#soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/soma_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+			prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/proximal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+			#midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/middle_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+			#dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/distal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+		
+	if delta_t_array == 1:
+		fine_array = np.arange(-5, 5.1, 0.1)
+		for j in range(len(fine_array)):
+			T_vals.append(round(fine_array[j],1))
+		for i in range(len(fine_array)):
+			soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/soma_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
+			prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/proximal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
+			midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/middle_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
+			dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/distal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
 
-num_var = soma_syn[0].num_variables
+	if delta_t_array == 2:
+		coarse_array1 = np.arange(-50, 5)
+		for j in range(len(coarse_array1)):
+			T_vals.append(int(coarse_array1[j]))
+		for i in range(len(coarse_array1)):
+			#soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/soma_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+			prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/proximal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+			#midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/middle_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+			#dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/distal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+		fine_array = np.arange(-5, 5.1, 0.1)
+		for j in range(len(fine_array)):
+			T_vals.append(round(fine_array[j],1))
+		for i in range(len(fine_array)):
+			#soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/soma_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[len(coarse_array1) + i]*10))))
+			prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/proximal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[len(coarse_array1) + i]*10))))
+			#midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/middle_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[len(coarse_array1) + i]*10))))
+			#dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/distal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[len(coarse_array1) + i]*10))))
+		coarse_array2 = np.arange(6, 51)
+		for j in range(len(coarse_array2)):
+			T_vals.append(int(coarse_array2[j]))
+		for i in range(len(coarse_array2)):
+			#soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/soma_{2}.dat".format(Ca_Type, KCC2_type, T_vals[len(coarse_array1) + len(fine_array) + i])))
+			prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/proximal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[len(coarse_array1) + len(fine_array) + i])))
+			#midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/middle_{2}.dat".format(Ca_Type, KCC2_type, T_vals[len(coarse_array1) + len(fine_array) + i])))
+			#dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/distal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[len(coarse_array1) + len(fine_array) + i])))
+
+	return T_vals
+
+T_vals = get_data(0)
+#num_var = soma_syn[0].num_variables
 
 def filter_data(syn_location, variable):
 	data = {}
 	if syn_location == 0: # GABA synapses inserted in soma
-		for i in range(len(coarse_timesteps)):
-			data[coarse_timesteps[i]] = {}
+		for i in range(len(T_vals)):
+			data[T_vals[i]] = {}
 
-			data[coarse_timesteps[i]][999] = soma_syn[i].var_list.varList[variable].secList[0]
+			data[T_vals[i]][999] = soma_syn[i].var_list.varList[variable].secList[0]
 			for j in range(len(prox_seclist)): 
-				data[coarse_timesteps[i]][prox_seclist[j]] = soma_syn[i].var_list.varList[variable].secList[1][j]
+				data[T_vals[i]][prox_seclist[j]] = soma_syn[i].var_list.varList[variable].secList[1][j]
 
 			for j in range(len(midd_seclist)): 
-				data[coarse_timesteps[i]][midd_seclist[j]] = soma_syn[i].var_list.varList[variable].secList[2][j]
+				data[T_vals[i]][midd_seclist[j]] = soma_syn[i].var_list.varList[variable].secList[2][j]
 
 			for j in range(len(dist_seclist)): 
-				data[coarse_timesteps[i]][dist_seclist[j]] = soma_syn[i].var_list.varList[variable].secList[3][j]
+				data[T_vals[i]][dist_seclist[j]] = soma_syn[i].var_list.varList[variable].secList[3][j]
 
 	if syn_location == 1: # GABA synapses inserted in proximal dendrites
-		for i in range(len(coarse_timesteps)):
-			data[coarse_timesteps[i]] = {}
+		for i in range(len(T_vals)):
+			data[T_vals[i]] = {}
 
-			data[coarse_timesteps[i]][999] = prox_syn[i].var_list.varList[variable].secList[0]
+			data[T_vals[i]][999] = prox_syn[i].var_list.varList[variable].secList[0]
 			for j in range(len(prox_seclist)): 
-				data[coarse_timesteps[i]][prox_seclist[j]] = prox_syn[i].var_list.varList[variable].secList[1][j]
+				data[T_vals[i]][prox_seclist[j]] = prox_syn[i].var_list.varList[variable].secList[1][j]
 
 			for j in range(len(midd_seclist)): 
-				data[coarse_timesteps[i]][midd_seclist[j]] = prox_syn[i].var_list.varList[variable].secList[2][j]
+				data[T_vals[i]][midd_seclist[j]] = prox_syn[i].var_list.varList[variable].secList[2][j]
 
 			for j in range(len(dist_seclist)): 
-				data[coarse_timesteps[i]][dist_seclist[j]] = prox_syn[i].var_list.varList[variable].secList[3][j]
+				data[T_vals[i]][dist_seclist[j]] = prox_syn[i].var_list.varList[variable].secList[3][j]
 
 	if syn_location == 2: # GABA synapses inserted in middle dendrites
-		for i in range(len(coarse_timesteps)):
-			data[coarse_timesteps[i]] = {}
+		for i in range(len(T_vals)):
+			data[T_vals[i]] = {}
 
-			data[coarse_timesteps[i]][999] = midd_syn[i].var_list.varList[variable].secList[0]
+			data[T_vals[i]][999] = midd_syn[i].var_list.varList[variable].secList[0]
 			for j in range(len(prox_seclist)): 
-				data[coarse_timesteps[i]][prox_seclist[j]] = midd_syn[i].var_list.varList[variable].secList[1][j]
+				data[T_vals[i]][prox_seclist[j]] = midd_syn[i].var_list.varList[variable].secList[1][j]
 
 			for j in range(len(midd_seclist)): 
-				data[coarse_timesteps[i]][midd_seclist[j]] = midd_syn[i].var_list.varList[variable].secList[2][j]
+				data[T_vals[i]][midd_seclist[j]] = midd_syn[i].var_list.varList[variable].secList[2][j]
 
 			for j in range(len(dist_seclist)): 
-				data[coarse_timesteps[i]][dist_seclist[j]] = midd_syn[i].var_list.varList[variable].secList[3][j]
+				data[T_vals[i]][dist_seclist[j]] = midd_syn[i].var_list.varList[variable].secList[3][j]
 
 	if syn_location == 3: # GABA synapses inserted in distal dendrites 
-		for i in range(len(coarse_timesteps)):
-			data[coarse_timesteps[i]] = {}
+		for i in range(len(T_vals)):
+			data[T_vals[i]] = {}
 
-			data[coarse_timesteps[i]][999] = dist_syn[i].var_list.varList[variable].secList[0]
+			data[T_vals[i]][999] = dist_syn[i].var_list.varList[variable].secList[0]
 			for j in range(len(prox_seclist)): 
-				data[coarse_timesteps[i]][prox_seclist[j]] = dist_syn[i].var_list.varList[variable].secList[1][j]
+				data[T_vals[i]][prox_seclist[j]] = dist_syn[i].var_list.varList[variable].secList[1][j]
 
 			for j in range(len(midd_seclist)): 
-				data[coarse_timesteps[i]][midd_seclist[j]] = dist_syn[i].var_list.varList[variable].secList[2][j]
+				data[T_vals[i]][midd_seclist[j]] = dist_syn[i].var_list.varList[variable].secList[2][j]
 
 			for j in range(len(dist_seclist)): 
-				data[coarse_timesteps[i]][dist_seclist[j]] = dist_syn[i].var_list.varList[variable].secList[3][j]
+				data[T_vals[i]][dist_seclist[j]] = dist_syn[i].var_list.varList[variable].secList[3][j]
 
 	return data
 
 
 def plot_CA1(syn_location, variable, time):
+	if syn_location == 0: 
+		loc_string = 'somatic'
+	elif syn_location == 1:
+		loc_string = 'proximal'
+	elif syn_location == 2: 
+		loc_string = 'middle'
+	elif syn_location == 3: 
+		loc_string = 'distal'
+	else: 
+		print "Synaptic Location Error"
+
 	data = filter_data(syn_location, variable)
 	max_vals = []
 	min_vals = []
-	for i in range(len(coarse_timesteps)):
-		max_vals.append(max(data[coarse_timesteps[i]][999]))
-		min_vals.append(min(data[coarse_timesteps[i]][999]))	
-	for i in range(len(coarse_timesteps)):
+	for i in range(len(T_vals)):
+		max_vals.append(max(data[T_vals[i]][999]))
+		min_vals.append(min(data[T_vals[i]][999]))	
+	for i in range(len(T_vals)):
 		for j in range(180): 
-			max_vals.append(max(data[coarse_timesteps[i]][j]))
-			min_vals.append(min(data[coarse_timesteps[i]][j]))
+			max_vals.append(max(data[T_vals[i]][j]))
+			min_vals.append(min(data[T_vals[i]][j]))
 	norm_min = min(min_vals)
 	norm_max = max(max_vals)
 
+	#Get info to draw cell geometry
 	cell_1 = geomReader("./CA1geometry.dat")
 	morpho = cell_1.data_vec
 	items = len(morpho[0,:])
@@ -344,13 +423,50 @@ def plot_CA1(syn_location, variable, time):
 	parent_child.append((178,0,177,1))
 	parent_child.append((179,0,177,1))
 
+	# Get info to draw synapses
+	synapses = synReader("./CA1{0}synapses.dat".format(loc_string))
+	print len(CA1[999][0])
+	section_length = {}
+	synapse_length = {}
+	syn_coords = []
+	for i in range(len(synapses.data_vec)):
+		print "section index", int(synapses.data_vec[i][0])
+		print "number of segments in section", len(CA1[int(synapses.data_vec[i][0])][0])
+		coord = {}
+		d = []
+		for j in range(len(CA1[int(synapses.data_vec[i][0])][0])-1):
+			if j == 0: 
+				d.append(np.sqrt((CA1[int(synapses.data_vec[i][0])][0][j+1] - CA1[int(synapses.data_vec[i][0])][0][j])**2 + (CA1[int(synapses.data_vec[i][0])][1][j+1] - CA1[int(synapses.data_vec[i][0])][1][j])**2 + (CA1[int(synapses.data_vec[i][0])][2][j+1] - CA1[int(synapses.data_vec[i][0])][2][j])**2))
+				coord[j] = ([CA1[int(synapses.data_vec[i][0])][0][j],CA1[int(synapses.data_vec[i][0])][1][j],CA1[int(synapses.data_vec[i][0])][2][j]],[CA1[int(synapses.data_vec[i][0])][0][j+1],CA1[int(synapses.data_vec[i][0])][1][j+1],CA1[int(synapses.data_vec[i][0])][2][j+1]])
+			else:
+				d.append(d[j-1] + np.sqrt((CA1[int(synapses.data_vec[i][0])][0][j+1] - CA1[int(synapses.data_vec[i][0])][0][j])**2 + (CA1[int(synapses.data_vec[i][0])][1][j+1] - CA1[int(synapses.data_vec[i][0])][1][j])**2 + (CA1[int(synapses.data_vec[i][0])][2][j+1] - CA1[int(synapses.data_vec[i][0])][2][j])**2))
+				coord[j] = ([CA1[int(synapses.data_vec[i][0])][0][j],CA1[int(synapses.data_vec[i][0])][1][j],CA1[int(synapses.data_vec[i][0])][2][j]],[CA1[int(synapses.data_vec[i][0])][0][j+1],CA1[int(synapses.data_vec[i][0])][1][j+1],CA1[int(synapses.data_vec[i][0])][2][j+1]])
+		section_length[i] = d[len(d)-1]
+		synapse_length[i] = section_length[i]*synapses.data_vec[i][1]
+		for k in range(len(d)-1):
+			if synapse_length[i] < d[k]:
+				#print "Synapse length is ", synapse_length[i], " while d[k] is ", d[k], " d[k+1] is ", d[k+1]
+				continue
+			elif d[k] <= synapse_length[i] <= d[k+1]:
+				print "Synapse somewhere in between", d[k-1], " and ", d[k]
+				d_syn = synapse_length[i] - d[k]
+				d_length = d[k+1] - d[k]
+				del_d = d_syn/d_length
+				del_x = coord[k][0][0] - coord[k][1][0]
+				del_y = coord[k][0][1] - coord[k][1][1]
+				del_z = coord[k][0][2] - coord[k][1][2]
+				syn_coords.append((coord[k][0][0] + del_d*del_x, coord[k][0][1] + del_d*del_y, coord[k][0][2] + del_d*del_z))
+			#else:
+			#	print "to be continued"
+
+
 	# Set Colourmap properties
 	norm = col.Normalize(vmin=norm_min, vmax=norm_max)
 	cmap = cm.spring
 	m = cm.ScalarMappable(norm=norm, cmap=cmap)
 
 	# Map Data onto CA1 neuron morphology using colour mapping 
-	fig, ax = plt.subplots(figsize=(12,12))
+	fig, ax = plt.subplots(figsize=(10,12))
 	for i in range(len(indicies)):
 		for j in range(len(CA1[indicies[i]][0])-1):
 			x1 = CA1[indicies[i]][0][j]
@@ -387,6 +503,9 @@ def plot_CA1(syn_location, variable, time):
 			ax.plot([x1,x2], [y1,y2], c=colour)
 		else:
 			print "Indexing Error"
+	## Add synapse markers 
+	#for i in range(len(syn_coords)):
+	#	ax.plot(syn_coords[i][0], syn_coords[i][1], 'k', marker ='x')
 
 	#Plot Features
 	ax.set_title("$\Delta$t = %s ms" %time)
@@ -411,21 +530,398 @@ def plot_CA1(syn_location, variable, time):
 	else: 
 		print "Variable Error"
 
+	#for i in range(2):
+	#	if i == 0:
+	#		file_type = 'png'
+	#	elif i == 1: 
+	#		file_type = 'svg'
+	#	else:
+	#		print "File Type Error"
+	save('./data/Ca_{0}/KCC2_{1}/PythonPlots/{2}/{2}_{3}_{4}'.format(Ca_Type, KCC2_type, var_string, loc_string, time), ext='svg')
+	plt.show()
+
+
+def plot_STDP(syn_location, variable, timescale):
+	soma_points = np.zeros(len(timescale))
+	prox_points = np.zeros(len(timescale))
+	midd_points = np.zeros(len(timescale))
+	dist_points = np.zeros(len(timescale))
+
+	if syn_location == 0: # GABA synapses inserted in soma
+		for i in range(len(timescale)):
+			soma_points[i] = soma_syn[i].var_list.varList[variable].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + soma_syn[i].var_list.varList[variable].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + soma_syn[i].var_list.varList[variable].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + soma_syn[i].var_list.varList[variable].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+
+
+	if syn_location == 1: # GABA synapses inserted in proximal dendrites
+		for i in range(len(timescale)):
+			soma_points[i] = prox_syn[i].var_list.varList[variable].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + prox_syn[i].var_list.varList[variable].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + prox_syn[i].var_list.varList[variable].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + prox_syn[i].var_list.varList[variable].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+
+	if syn_location == 2: # GABA synapses inserted in middle dendrites
+		for i in range(len(timescale)):
+			soma_points[i] = midd_syn[i].var_list.varList[variable].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + midd_syn[i].var_list.varList[variable].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + midd_syn[i].var_list.varList[variable].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + midd_syn[i].var_list.varList[variable].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+
+	if syn_location == 3: # GABA synapses inserted in distal dendrites 
+		for i in range(len(timescale)):
+			soma_points[i] = dist_syn[i].var_list.varList[variable].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + dist_syn[i].var_list.varList[variable].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + dist_syn[i].var_list.varList[variable].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + dist_syn[i].var_list.varList[variable].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+
+	#Plot Features
+	fig, ax = plt.subplots(figsize=(12,8))
+	
+	soma_plot = ax.plot(timescale, soma_points, label='Soma', color='red', marker='.')
+	prox_plot = ax.plot(timescale, prox_points, label='Proximal Dendrites', color='orange', marker='.')
+	midd_plot = ax.plot(timescale, midd_points, label='Middle Dendrites', color='green', marker ='.')
+	dist_plot = ax.plot(timescale, dist_points, label='Distal Dendrites', color='blue', marker='.')
+
 	if syn_location == 0: 
-		loc_string = 'somatic'
+		loc_string = 'Soma'
 	elif syn_location == 1:
-		loc_string = 'proximal'
+		loc_string = 'Proximal Dendrites'
 	elif syn_location == 2: 
-		loc_string = 'middle'
+		loc_string = 'Middle Dendrites'
 	elif syn_location == 3: 
-		loc_string = 'distal'
+		loc_string = 'Distal Dendrites'
 	else: 
 		print "Synaptic Location Error"
-	save('./data/KCC2_vol/PythonPlots/{0}/{1}_{0}_{2}'.format(var_string, loc_string, time), 'png')
+
+	if variable == 0:
+		ax.set_xlim(min(T_vals), max(T_vals))
+		ax.set_ylim(-0.5,2.5)
+		ax.set_xlabel('$\Delta t$ (ms)')
+		ax.set_ylabel('Average $\Delta E_{Cl^{-}}$ (mV)')
+		fig.suptitle('GABAergic Synapses in {0}'.format(loc_string), fontsize=14)
+		var_string = 'ECl'
+	elif variable == 1:
+		ax.set_xlim(min(T_vals), max(T_vals))
+		ax.set_ylim(-3.0, 0.5)
+		ax.set_xlabel('$\Delta t$ (ms)')
+		ax.set_ylabel('Average $\Delta$ KCC2$_{MP}$')
+		fig.suptitle('GABAergic Synapses in {0}'.format(loc_string), fontsize=14)
+		var_string = 'MP'
+	elif variable == 2: 
+		ax.set_xlim(min(T_vals), max(T_vals))
+		ax.set_ylim(0.00, 0.12)
+		ax.set_xlabel('$\Delta t$ (ms)')
+		ax.set_ylabel('Average $Ca^{2+}$ (mM)')
+		fig.suptitle('GABAergic Synapses in {0}'.format(loc_string), fontsize=14)
+		var_string = 'Ca2+'
+	elif variable == 3:
+		ax.set_xlim(min(T_vals), max(T_vals))
+		#ax.set_ylim() 
+		ax.set_xlabel('$\Delta t$ (ms)')
+		ax.set_ylabel('Proportion of Active Kinase (%)')
+		fig.suptitle('GABAergic Synapses in {0}'.format(loc_string), fontsize=14)
+		var_string = 'kin'
+	elif variable == 4:
+		ax.set_xlim(min(T_vals), max(T_vals))
+		#ax.set_ylim()
+		ax.set_xlabel('$\Delta t$ (ms)')
+		ax.set_ylabel('Average Peak Voltage Reached During Plasticity Induction (mV)')
+		fig.suptitle('GABAergic Synapses in {0}'.format(loc_string), fontsize=14)
+		var_string = 'volt'
+	else: 
+		print "Variable Error"
+
+	ax.legend()
+	for i in range(2):
+		if i == 0:
+			file_type = 'png'
+		elif i == 1: 
+			file_type = 'svg'
+		else:
+			print "File Type Error"
+		save('./data/Ca_{0}/KCC2_{1}/PythonPlots/STDPcurves/{2}_{3}'.format(Ca_Type, KCC2_type, var_string, syn_location), ext=file_type)
+	#plt.show()
+	
+def plot_bar_ECL(syn_location):
+	if syn_location == 0: 
+		loc_string = 'Soma'
+	elif syn_location == 1:
+		loc_string = 'Proximal Dendrites'
+	elif syn_location == 2: 
+		loc_string = 'Middle Dendrites'
+	elif syn_location == 3: 
+		loc_string = 'Distal Dendrites'
+	else: 
+		print "Synaptic Location Error"
+
+	soma_points = np.zeros(len(T_vals))
+	prox_points = np.zeros(len(T_vals))
+	midd_points = np.zeros(len(T_vals))
+	dist_points = np.zeros(len(T_vals))
+
+	if syn_location == 0: # GABA synapses inserted in soma
+		for i in range(len(T_vals)):
+			soma_points[i] = soma_syn[i].var_list.varList[0].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + soma_syn[i].var_list.varList[0].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + soma_syn[i].var_list.varList[0].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + soma_syn[i].var_list.varList[0].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+		
+
+	if syn_location == 1: # GABA synapses inserted in proximal dendrites
+		for i in range(len(T_vals)):
+			soma_points[i] = prox_syn[i].var_list.varList[0].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + prox_syn[i].var_list.varList[0].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + prox_syn[i].var_list.varList[0].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + prox_syn[i].var_list.varList[0].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+		pre_only_data = nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/proximal_preonly.dat".format(Ca_Type, KCC2_type))
+		pre_only_soma = pre_only_data.var_list.varList[0].secList[0]
+		pre_prox_avg = 0
+		for j in range(len(prox_seclist)): 
+			pre_prox_avg = pre_prox_avg + pre_only_data.var_list.varList[0].secList[1][j]
+		pre_prox_point = pre_prox_avg/len(prox_seclist)
+		
+		pre_midd_avg = 0
+		for j in range(len(midd_seclist)): 
+			pre_midd_avg = pre_midd_avg + pre_only_data.var_list.varList[0].secList[2][j]
+		pre_midd_point = pre_midd_avg/len(midd_seclist)
+		
+		pre_dist_avg = 0
+		for j in range(len(dist_seclist)): 
+			pre_dist_avg = pre_dist_avg + pre_only_data.var_list.varList[0].secList[3][j]
+		pre_dist_point = pre_dist_avg/len(dist_seclist)
+
+			
+		post_only_data = nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/postonly.dat".format(Ca_Type, KCC2_type))
+		post_only_soma = post_only_data.var_list.varList[0].secList[0]
+		print "post only soma", post_only_soma
+		post_prox_avg = 0
+		for j in range(len(prox_seclist)): 
+			post_prox_avg = post_prox_avg + post_only_data.var_list.varList[0].secList[1][j]
+		post_prox_point = post_prox_avg/len(prox_seclist)
+		
+		post_midd_avg = 0
+		for j in range(len(midd_seclist)): 
+			post_midd_avg = post_midd_avg + post_only_data.var_list.varList[0].secList[2][j]
+		post_midd_point = post_midd_avg/len(midd_seclist)
+		
+		post_dist_avg = 0
+		for j in range(len(dist_seclist)): 
+			post_dist_avg = post_dist_avg + post_only_data.var_list.varList[0].secList[3][j]
+		post_dist_point = post_dist_avg/len(dist_seclist)
+
+	if syn_location == 2: # GABA synapses inserted in middle dendrites
+		for i in range(len(T_vals)):
+			soma_points[i] = midd_syn[i].var_list.varList[0].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + midd_syn[i].var_list.varList[0].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + midd_syn[i].var_list.varList[0].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + midd_syn[i].var_list.varList[0].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+
+	if syn_location == 3: # GABA synapses inserted in distal dendrites 
+		for i in range(len(T_vals)):
+			soma_points[i] = dist_syn[i].var_list.varList[0].secList[0]
+
+			prox_avg = 0
+			for j in range(len(prox_seclist)): 
+				prox_avg = prox_avg + dist_syn[i].var_list.varList[0].secList[1][j]
+			prox_points[i] = prox_avg/len(prox_seclist)
+
+			midd_avg = 0
+			for j in range(len(midd_seclist)): 
+				midd_avg = midd_avg + dist_syn[i].var_list.varList[0].secList[2][j]
+			midd_points[i] = midd_avg/len(midd_seclist)
+
+			dist_avg = 0
+			for j in range(len(dist_seclist)): 
+				dist_avg = dist_avg + dist_syn[i].var_list.varList[0].secList[3][j]
+			dist_points[i] = dist_avg/len(dist_seclist)
+	
+	coincident = {}
+	noncoincident = {}
+	coincident['soma'] = []
+	coincident['prox'] = []
+	coincident['midd'] = []
+	coincident['dist'] = []
+	noncoincident['soma'] = []
+	noncoincident['prox'] = []
+	noncoincident['midd'] = []
+	noncoincident['dist'] = []
+	for i in range(len(T_vals)):
+		if T_vals[i] <= -50:
+			noncoincident['soma'].append(soma_points[i])
+			noncoincident['prox'].append(prox_points[i])
+			noncoincident['midd'].append(midd_points[i])
+			noncoincident['dist'].append(dist_points[i])
+		if -20 <= T_vals[i] <= 20:
+			coincident['soma'].append(soma_points[i])
+			coincident['prox'].append(prox_points[i])
+			coincident['midd'].append(midd_points[i])
+			coincident['dist'].append(dist_points[i])
+		elif T_vals[i] >= 50:
+			noncoincident['soma'].append(soma_points[i])
+			noncoincident['prox'].append(prox_points[i])
+			noncoincident['midd'].append(midd_points[i])
+			noncoincident['dist'].append(dist_points[i])
+
+	co_soma_avg = sum(coincident['soma'])/len(coincident['soma'])
+	co_prox_avg = sum(coincident['prox'])/len(coincident['prox'])
+	co_midd_avg = sum(coincident['midd'])/len(coincident['midd'])
+	co_dist_avg = sum(coincident['dist'])/len(coincident['dist'])
+	nonco_soma_avg = sum(noncoincident['soma'])/len(noncoincident['soma'])
+	nonco_prox_avg = sum(noncoincident['prox'])/len(noncoincident['prox'])
+	nonco_midd_avg = sum(noncoincident['midd'])/len(noncoincident['midd'])
+	nonco_dist_avg = sum(noncoincident['dist'])/len(noncoincident['dist'])
+
+	if syn_location == 1:
+		pre_only = {}
+		pre_only['soma'] = pre_only_soma
+		pre_only['prox'] = pre_prox_point
+		pre_only['midd'] = pre_midd_point
+		pre_only['dist'] = pre_dist_point
+		post_only = {}
+		post_only['soma'] = post_only_soma
+		post_only['prox'] = post_prox_point
+		post_only['midd'] = post_midd_point
+		post_only['dist'] = post_dist_point
+
+	ind = np.arange(4)  # the x locations for the groups
+	width = 0.25       # the width of the bars
+
+	somatic = np.array([co_soma_avg, nonco_soma_avg, pre_only_soma, post_only_soma])
+	proximal = np.array([co_prox_avg, nonco_prox_avg, pre_prox_point , post_prox_point])
+	middle = np.array([co_midd_avg, nonco_midd_avg, pre_midd_point, post_midd_point])
+	distal = np.array([co_dist_avg, nonco_dist_avg, pre_dist_point, post_dist_point])
+	#coincident = np.array([co_soma_avg, co_prox_avg, co_midd_avg, co_dist_avg])
+	#noncoincident = np.array([nonco_soma_avg, nonco_prox_avg, nonco_midd_avg, nonco_dist_avg])
+
+	fig, ax = plt.subplots(figsize=(8,10))
+	soma_plot = ax.bar(ind, somatic, width, color='red')
+	prox_plot = ax.bar(ind+0.75*width, proximal, width, color='orange')
+	midd_plot = ax.bar(ind+1.5*width, middle, width, color='green')
+	dist_plot = ax.bar(ind+2.25*width, distal, width, color='blue')
+
+	# add some text for labels, title and axes ticks
+	fig.suptitle('GABAergic Synapses in {0} \n KCC2 Distribution by {1} \n {2}'.format(loc_string, KCC2_type, ca_channel_string), fontsize=14)
+	ax.set_ylim(-0.1,2.5)
+	ax.set_ylabel('Average $\Delta E_{Cl^{-}}$ (mV)')
+	ax.set_xticks(ind+(2*width))
+	ax.set_xticklabels( ('Coincident', 'Non-coincident', 'Presynaptic \n Activation \n Only', 'Postsynaptic \n Activation \n Only') )
+	
+	ax.legend( (soma_plot[0], prox_plot[0], midd_plot[0], dist_plot[0]), ('Soma', 'Proximal Dendrites', 'Middle Dendrites', 'Distal Dendrites') )
+	
+	# Save graph
+	#for i in range(2):
+	#	if i == 0:
+	#		file_type = 'png'
+	#	elif i == 1: 
+	#		file_type = 'svg'
+	#	else:
+	#		print "File Type Error"
+	# 	save('./data/Summary/CoNonCo/Ca_{0}_KCC2_{1}_{2}'.format(Ca_Type, KCC2_type, syn_location), ext=file_type)
+	plt.show()
+
+
+
+#for i in range(1): # run through syn_loc
+#	for j in range(1): # run through variables
+#		for k in range(1): #(len(T_vals)):
+#			print k
+#			print T_vals[k]
+#			plot_CA1(2, 0, 10)
+
+#plot_CA1(1,0,0)
 
 for i in range(1): # run through syn_loc
-	for j in range(1): # run through variables
-		for k in range(len(coarse_timesteps)):
-			plot_CA1(i, j, coarse_timesteps[k])
+	for j in range(3): # run through variables
+			plot_STDP(1, j, T_vals)
 
 
+
+			
+#for k in range(1):
+#	plot_bar_ECL(1)

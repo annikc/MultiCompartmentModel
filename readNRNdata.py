@@ -197,7 +197,7 @@ def save(path, ext='png', close=True, verbose=True):
     if verbose:
         print("Done")
 
-#soma_pos1 = nrnReader("../../../../../msc/SciNet/data/coarseExpts/soma_1.dat")
+prox_pos1 = nrnReader("./data/Ca_LT/KCC2_SA/coarseExpts/proximal_1.dat")
 
-#print soma_pos1.var_list.varList[1].secList[0]
+print prox_pos1.var_list.varList[1].secList[0]
 

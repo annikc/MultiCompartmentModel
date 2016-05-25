@@ -1,7 +1,0 @@
-/home/t/tyrell/annik/neuron/nrn/bin/nrnivmodl: line 162: make: command not found
-NEURON -- Release 7.3 (841:8bd842aaf0ab) 2013-03-31
-Duke, Yale, and the BlueBrain Project -- Copyright 1984-2013
-See http://www.neuron.yale.edu/neuron/credits
-
-Additional mechanisms from files
- AMPA.mod CClamp.mod GABAa.mod HH.mod KCC2.mod KCC2_Trans.mod cad.mod calH.mod calL.mod cat.mod

@@ -140,7 +140,7 @@ hbox = new HBox(0)
 hbox.intercept(1)
 xpanel("Specify Parameters")
 	xlabel("PAIRED SYNAPSES")
-		location_paired_prompt = 3
+		location_paired_prompt = 1
 		xmenu("Location of Paired Synapses") 
 			xradiobutton("Soma", "set_location_paired(0)")
 			xradiobutton("Proximal Dendrite", "set_location_paired(1)")
@@ -149,7 +149,7 @@ xpanel("Specify Parameters")
 		xmenu()
 	 	xvarlabel(location_paired_string) 
 
-		density_paired_prompt = 0.0
+		density_paired_prompt = 0.1334
 		xvalue("Density of Paired Synapses","density_paired_prompt", 1)
 		
 		interval_paired_prompt = 200
@@ -158,7 +158,7 @@ xpanel("Specify Parameters")
 		number_paired_prompt = 150
 		xvalue("Number of Paired Synapse Spikes","number_paired_prompt", 1) 
 		
-		start_paired_prompt = 10050
+		start_paired_prompt = 100
 		xvalue("Start of Paired Synapse Spikes","start_paired_prompt", 1)	
 
 		noise_paired_prompt = 0
@@ -211,7 +211,7 @@ xpanel("Specify Parameters")
 		clamp_int_prompt = interval_paired_prompt
 		xvalue("Interval Between Current Clamp Events","clamp_int_prompt", 1)
 		
-		clamp_num_prompt = 0
+		clamp_num_prompt = number_paired_prompt
 		xvalue("Number of Current Clamp Events","clamp_num_prompt", 1)
 
 		clamp_noise_prompt = 0

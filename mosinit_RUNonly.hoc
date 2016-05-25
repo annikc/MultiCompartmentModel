@@ -43,7 +43,7 @@ objref timesteps
 timesteps = new Vector()
 
 proc add_timestep(){
-	timesteps.append(1) //,-15,-10,-5,-4,-3,-2,-1,0,1,2,3,4,5,10,15,25,50)
+	timesteps.append(5) //,-15,-10,-5,-4,-3,-2,-1,0,1,2,3,4,5,10,15,25,50)
 }
 add_timestep()
 

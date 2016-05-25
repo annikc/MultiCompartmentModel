@@ -7,7 +7,7 @@
 
 	// built in parameters 
 		v_init            = -70     // mV												
-		tstop             = 100000  // ms  				FOR PLASTICITY INDUCTION PROTOCOL OF 20s														
+		tstop             = 40500  // ms  				FOR PLASTICITY INDUCTION PROTOCOL OF 20s														
 		dt                = 0.025   // ms														
 		celsius           = 36      // C degrees										
 	// custom parameters 											from makeIons.hoc  
@@ -216,10 +216,10 @@
 		start_paired		= start_paired_prompt		// ms 										
 		noise_paired		= noise_paired_prompt		// Boolean: 0 = noiseless, 1 = Poisson 		
 		//GABAa maximal conductance
-		gmax_paired_soma	= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
-		gmax_paired_prox	= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
-		gmax_paired_mid		= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
-		gmax_paired_dist	= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
+		gmax_paired_soma	= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
+		gmax_paired_prox	= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
+		gmax_paired_mid		= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
+		gmax_paired_dist	= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
 	// unpaired synapses
 		location_unpaired 	= location_paired_prompt		// soma = 0, prox = 1, mid = 2, dist = 3
 		interval_unpaired	= interval_unpaired_prompt		// ms/spike 							

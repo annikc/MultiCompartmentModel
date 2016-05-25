@@ -5,6 +5,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 //////////////////// declarations /////////////////////////////////////////////
+strdef filename
+objref runfile
 
 // post-synaptic objects
 objref gaba_paired, gaba_unpaired
@@ -30,6 +32,20 @@ objref gaba_unpaired_tvec, gaba_unpaired_idvec
 // gaba_unpaired_tvec   = new Vector()
 gaba_unpaired_idvec  = new Vector()
 
+objref syn_location
+syn_location = new Vector()
+
+objref scts
+scts = new Vector()
+
+// write synapses 
+strdef syn_file, CA1synapses
+objref runfile
+
+objref header
+header = new Vector()
+objref syn_write_info
+syn_write_info = new Vector()
 //////////////////// procedure definitions ////////////////////////////////////
 
 //-----------------------------------------------------------------------------
@@ -44,7 +60,7 @@ gaba_unpaired_idvec  = new Vector()
 // 3 = distal
 
 proc make_gaba() { local secdis, secarea, numsyn, xpos, x, i, j, k  	localobj posr //declares local variablesa components, and add them to the lists
-
+	syn_location.resize(0)
 // create a random number generator
   	posr = new Random(seed_prompt)
   	posr.uniform(0,1)
@@ -65,11 +81,13 @@ proc make_gaba() { local secdis, secarea, numsyn, xpos, x, i, j, k  	localobj po
 		
 		    // calculate the number of synapses on this section
 		    numsyn = int(secarea*$2)
+		    print "numsyn is ", numsyn
 		
 		    // for each synapse, pick a random location,
 		    // create gaba components, and add them to the lists
-		    for i=1,numsyn {
+		    for i=1,numsyn{
 		    	xpos = posr.repick()
+		    	syn_location.append(xpos)
 		    	gaba_paired.append(new GABAa(xpos))
 		    	gaba_paired.o(gaba_paired.count()-1).gmax = gmax_paired_soma									
 		    }
@@ -123,6 +141,7 @@ proc make_gaba() { local secdis, secarea, numsyn, xpos, x, i, j, k  	localobj po
 		    // create gaba components, and add them to the lists
 		    for i=1,numsyn {
 		    	xpos = posr.repick()
+		    	syn_location.append(xpos)
 		    	gaba_paired.append(new GABAa(xpos))
 		    	gaba_paired.o(gaba_paired.count()-1).gmax = gmax_paired_prox
 		    	gaba_paired_idvec.append(proximal_indices.x(j))
@@ -182,6 +201,7 @@ proc make_gaba() { local secdis, secarea, numsyn, xpos, x, i, j, k  	localobj po
 		    // create gaba components, and add them to the lists
 		    for i=1,numsyn {
 		    	xpos = posr.repick()
+		    	syn_location.append(xpos)
 		    	gaba_paired.append(new GABAa(xpos))
 		    	gaba_paired.o(gaba_paired.count()-1).gmax = gmax_paired_mid
 		    	gaba_paired_idvec.append(middle_indices.x(j))
@@ -240,6 +260,7 @@ proc make_gaba() { local secdis, secarea, numsyn, xpos, x, i, j, k  	localobj po
 		    // create gaba components, and add them to the lists
 		    for i=1,numsyn {
 		    	xpos = posr.repick()
+		    	syn_location.append(xpos)
 		    	gaba_paired.append(new GABAa(xpos))
 		    	gaba_paired.o(gaba_paired.count()-1).gmax = gmax_paired_dist
 		    	gaba_paired_idvec.append(distal_indices.x(j))
@@ -275,7 +296,31 @@ proc make_gaba() { local secdis, secarea, numsyn, xpos, x, i, j, k  	localobj po
 		    j = j + 1
 	  	}
 	}
+print "# of GABA synapses is ", gaba_paired.count()
+
+scts.resize(0)
+for i = 0, gaba_paired.count()-1{
+	scts.append(999)
 }
+
+header.resize(0)
+header.append(gaba_paired.count())
+syn_write_info.resize(0)
+syn_write_info.append(scts)
+syn_write_info.append(syn_location)
+
+
+//runfile = new File()  // ask on forum about this
+//sprint(syn_file,"./CA1<INSERTSECTIONNAME>synapses.dat") 
+//runfile.wopen(syn_file)  // ask on forum about this
+//runfile.seek(0)  
+//header.vwrite(runfile)
+//syn_write_info.vwrite(runfile)
+//print "synapses written to file ", syn_file
+//runfile.close()
+	
+}
+
 
 
 

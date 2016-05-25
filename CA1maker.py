@@ -1,5 +1,5 @@
 from plot_cell import *
-from morphometricdata import *
+from readGEOMinfo import *
 from collections import defaultdict
 import matplotlib.pyplot as plt
 import matplotlib.colors as col
