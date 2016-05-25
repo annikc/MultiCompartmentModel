@@ -9,7 +9,16 @@ promptWindow.hoc
 ##promptWindow
 promptWindow gives user access to control of all parameters for STDP experiments. 
 ### Paired Synapses
-The location of these synapses can be set by the user from the dropdown menu. I have not set up synapse distribution throughout the entire cell simultaneously. Start of Paried Synapse Spikes determines the onset of plasticity induction. 
+The location of these synapses can be set by the user from the dropdown menu. I have not set up synapse distribution throughout the entire cell simultaneously. Synaptic density should be as follows: 
+```
+soma = 12.5 / um^2
+prox = 0.1334 / um^2
+midd = 0.009 / um^2
+dist = 0.0025 / um^2
+```
+By default synapses are in the proximal dendrites. 
+
+Start of Paried Synapse Spikes determines the onset of plasticity induction. 
 Paired synapses are GABAergic synapses which are pseudo-randomly distributed (per random synapse distribution seed, by default set as 37264 for no particular reason). They are "paired" with current clamp activity -- i.e. the clamp is set to start within some delta_t of the start of paired synapse spikes. (The delta_t value, inconveniently, is set in the mosinit files, in the procedure add_timestep().)
 To modify the delta_t value i.e. the time betweeen pre- and post-synaptic inputs, edit the correct *mosinit* file. If data is not recorded (default setting in promptWindow), the "Create Cell" button executes 
 ```
