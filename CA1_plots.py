@@ -14,6 +14,12 @@ import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 import pdb
 
+'''
+- Fix up get_data() to use define_timesteps in second block when gathering both coarse and fine data
+- Fix up strings for data locations (i.e. a better way of managing lowG) -- find another place to dump data? 
+- 
+'''
+
 
 def data_types(Ktype, Ctype):
 	if Ktype == 0 and Ctype == 0:
@@ -39,6 +45,7 @@ ktype_picker = 1
 catype_picker = 0
 
 KCC2_type = data_types(ktype_picker,catype_picker)[0]
+print KCC2_type
 Ca_Type = data_types(ktype_picker,catype_picker)[1]
 ca_channel_string = data_types(ktype_picker,catype_picker)[2]
 #KCC2_type = 'vol'
@@ -59,29 +66,36 @@ prox_syn = []
 midd_syn = []
 dist_syn = []
 
+def define_timesteps(start,end,stepsize=1):
+	timesteps = np.arange(start,end,stepsize)
+	if stepsize >= 1:
+		res = 'coarse'
+	elif 0 < stepsize < 1:
+		res = 'fine'
+	return (timesteps, res)
+
 def get_data(delta_t_array):
 	T_vals = []
-	if delta_t_array == 0: 
-		coarse_array = np.arange(-50, 51)
-		for j in range(len(coarse_array)):
-			T_vals.append(int(coarse_array[j]))
-		for i in range(len(coarse_array)):
-			#soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/soma_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
-			prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/proximal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
-			#midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/middle_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
-			#dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/distal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
-		
+	if delta_t_array == 0:
+		starttime = -50
+		endtime = 19
+		timesteps = define_timesteps(starttime,endtime)[0]
+		res = define_timesteps(starttime,endtime)[1]
+		for j in range(len(timesteps)):
+			T_vals.append(int(timesteps[j]))
+		for i in range(len(timesteps)):
+			if res == 'coarse':
+				#soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/soma_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+				prox_syn.append(nrnReader("./data/Ca_{0}/lowG/coarseExpts/proximal_{1}.dat".format(Ca_Type, T_vals[i])))
+				#midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/middle_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+				#dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/coarseExpts/distal_{2}.dat".format(Ca_Type, KCC2_type, T_vals[i])))
+			if res == 'fine':
+				soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/soma_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
+				prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/proximal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
+				midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/middle_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
+				dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/distal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
+			
 	if delta_t_array == 1:
-		fine_array = np.arange(-5, 5.1, 0.1)
-		for j in range(len(fine_array)):
-			T_vals.append(round(fine_array[j],1))
-		for i in range(len(fine_array)):
-			soma_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/soma_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
-			prox_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/proximal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
-			midd_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/middle_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
-			dist_syn.append(nrnReader("./data/Ca_{0}/KCC2_{1}/fineExpts/distal_pt_{2}.dat".format(Ca_Type, KCC2_type, int(T_vals[i]*10))))
-
-	if delta_t_array == 2:
 		coarse_array1 = np.arange(-50, 5)
 		for j in range(len(coarse_array1)):
 			T_vals.append(int(coarse_array1[j]))
@@ -537,7 +551,7 @@ def plot_CA1(syn_location, variable, time):
 	#		file_type = 'svg'
 	#	else:
 	#		print "File Type Error"
-	save('./data/Ca_{0}/KCC2_{1}/PythonPlots/{2}/{2}_{3}_{4}'.format(Ca_Type, KCC2_type, var_string, loc_string, time), ext='svg')
+	#save('./data/Ca_{0}/KCC2_{1}/PythonPlots/{2}/{2}_{3}_{4}'.format(Ca_Type, KCC2_type, var_string, loc_string, time), ext='svg')
 	plt.show()
 
 
@@ -689,8 +703,8 @@ def plot_STDP(syn_location, variable, timescale):
 			file_type = 'svg'
 		else:
 			print "File Type Error"
-		save('./data/Ca_{0}/KCC2_{1}/PythonPlots/STDPcurves/{2}_{3}'.format(Ca_Type, KCC2_type, var_string, syn_location), ext=file_type)
-	#plt.show()
+		#save('./data/Ca_{0}/KCC2_{1}/PythonPlots/STDPcurves/{2}_{3}'.format(Ca_Type, KCC2_type, var_string, syn_location), ext=file_type)
+	plt.show()
 	
 def plot_bar_ECL(syn_location):
 	if syn_location == 0: 
@@ -914,14 +928,15 @@ def plot_bar_ECL(syn_location):
 #			print T_vals[k]
 #			plot_CA1(2, 0, 10)
 
-#plot_CA1(1,0,0)
+#plot_CA1(1,0,-50)
 
 for i in range(1): # run through syn_loc
-	for j in range(3): # run through variables
-			plot_STDP(1, j, T_vals)
+	for j in range(1): # run through variables
+			plot_STDP(1, 2, T_vals)
 
 
 
 			
 #for k in range(1):
 #	plot_bar_ECL(1)
+#
