@@ -47,28 +47,28 @@
 // ion parameters 													from .mod files {kleak, naleak, KCC2} to makeIons.hoc, makeTransporters.hoc
 	// somatic section 
 		// leak parameters 
-			gl_soma 		= 0.001		// S/cm^2				
+			gl_soma 		= 0.04		// S/cm^2				
 			el_soma			= -70 		// mV
 		// chloride parameters											
 			axD_soma        = 2     	// um^2/ms  (http://www.nature.com/articles/srep23196; Kuner & Augustine Neuron 2000)
 	
 	// proximal dendritic section
 		// leak parameters
-			gl_prox 		= 0.001		// S/cm^2
+			gl_prox 		= 0.04		// S/cm^2
 			el_prox			= -70 		// mV
 		// chloride parameters
 			axD_prox        = 2     	// um^2/ms 				 								
 	
 	// middle dendritic section
 		// leak parameters
-			gl_mid  		= 0.001		// S/cm^2
+			gl_mid  		= 0.04		// S/cm^2
 			el_mid			= -70 		// mV
 		// chloride parameters
 			axD_mid        = 2    		// um^2/ms 	 										
 	
 	// distal dendritic section
 		// leak parameters
-			gl_dist  		= 0.001		// S/cm^2
+			gl_dist  		= 0.04		// S/cm^2
 			el_dist			= -70 		// mV
 		// chloride parameters
 			axD_dist        = 2      	// um^2/ms 	 											
@@ -78,8 +78,8 @@
 	// somatic section
 		// Hodgkin-Huxley Na & K currents
 			hh_soma         = 1    		// Boolean: 0 = no HH in soma, 1 = HH in soma
-			gnabar_soma     = 0.120		// S/cm^2 			(as given in Saraga et al. 2008, J Neurosci.) 										  	
-			gkbar_soma      = 0.005		// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 			 
+			gnabar_soma     = 1.120		// S/cm^2 			(as given in Saraga et al. 2008, J Neurosci.) 										  	
+			gkbar_soma      = 0.05		// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 			 
 			vtraub_soma     = -60  		// mV 												 
 		// Calcium Currents 								(as given in Poirazi et al., 2003, Neuron)
 			vgcc_soma		= 1 		// Boolean: 0 = no VGCC in soma, 1 = VGCC in soma 	
@@ -90,8 +90,8 @@
 	// proximal dendritic section
 		// Hodgkin-Huxley Na & K currents
 			hh_prox         = 1    		// Boolean: 0 = no HH in prox, 1 = HH in prox
-			gnabar_prox     = 0.120 	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 
-			gkbar_prox      = 0.005		// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 
+			gnabar_prox     = 1.120 	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 
+			gkbar_prox      = 0.05		// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 
 			vtraub_prox     = -60  		// mV
 		// Calcium Currents 									(as given in Poirazi et al., 2003, Neuron)
 			vgcc_prox		= 1 		// Boolean: 0 = no VGCC in prox, 1 = VGCC in prox 	
@@ -102,8 +102,8 @@
 	// middle dendritic section
 		// Hodgkin-Huxley Na & K currents	
 			hh_mid        	= 1     	// Boolean: 0 = no HH in mid, 1 = HH in mid
-			gnabar_mid    	= 0.120 	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.)
-			gkbar_mid      	= 0.005 	// S/cm^2				(as given in Saraga et al. 2008, J Neurosci.)
+			gnabar_mid    	= 1.120 	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.)
+			gkbar_mid      	= 0.05 	// S/cm^2				(as given in Saraga et al. 2008, J Neurosci.)
 			vtraub_mid     	= -60   	// mV 					
 		// Calcium Currents 									(as given in Poirazi et al., 2003, Neuron)
 			vgcc_mid		= 1 		// Boolean: 0 = no VGCC in mid, 1 = VGCC in mid 	
@@ -114,8 +114,8 @@
 	// distal dendritic section
 		// Hodgkin-Huxley Na & K currents
 			hh_dist         = 1    		// Boolean: 0 = no HH in dist, 1 = HH in dist
-			gnabar_dist     = 0.0120	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.)
-			gkbar_dist      = 0.005		// S/cm^2				(as given in Saraga et al. 2008, J Neurosci.)
+			gnabar_dist     = 1.120	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.)
+			gkbar_dist      = 0.05		// S/cm^2				(as given in Saraga et al. 2008, J Neurosci.)
 			vtraub_dist     = -60  		// mV
 		// Calcium Currents 									(as given in Poirazi et al., 2003, Neuron)
 			vgcc_dist		= 1 		// Boolean: 0 = no VGCC in dist, 1 = VGCC in dist 	from cat.mod, calL.mod

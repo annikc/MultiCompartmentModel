@@ -42,7 +42,7 @@ def data_types(Ktype, Ctype):
 	return (KCC2_type, Ca_Type, ca_channel_string)
 
 ktype_picker = 1
-catype_picker = 0
+catype_picker = 1
 
 KCC2_type = data_types(ktype_picker,catype_picker)[0]
 print KCC2_type
@@ -78,7 +78,7 @@ def get_data(delta_t_array):
 	T_vals = []
 	if delta_t_array == 0:
 		starttime = -50
-		endtime = 19
+		endtime = 39
 		timesteps = define_timesteps(starttime,endtime)[0]
 		res = define_timesteps(starttime,endtime)[1]
 		for j in range(len(timesteps)):
@@ -695,7 +695,7 @@ def plot_STDP(syn_location, variable, timescale):
 	else: 
 		print "Variable Error"
 
-	ax.legend()
+	ax.legend(loc=0)
 	for i in range(2):
 		if i == 0:
 			file_type = 'png'
@@ -932,7 +932,7 @@ def plot_bar_ECL(syn_location):
 
 for i in range(1): # run through syn_loc
 	for j in range(1): # run through variables
-			plot_STDP(1, 2, T_vals)
+			plot_STDP(1, 0, T_vals)
 
 
 
