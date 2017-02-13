@@ -1,0 +1,126 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeActiveChannels.hoc: inserts active ion channels into each section
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// procedure definitions ////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// channelsSoma()
+//-----------------------------------------------------------------------------
+// inserts channels in the soma
+
+proc channelsSoma() {
+
+  forsec somatic {
+
+    // Hodgkin-Huxley Na & K currents
+    if (hh_soma) {
+    	insert hh2
+    		gnabar_hh2 = gnabar_soma
+    		gkbar_hh2  = gkbar_soma
+    		vtraub_hh2 = vtraub_soma
+    }
+   
+   // Voltage Gated Calcium Channels
+   if (vgcc_soma) {
+    	insert cat
+    		gcatbar_cat = gcatbar_soma
+    	insert calL
+    		gcalbar_calL = gcalbar_soma
+      insert cad 
+    }
+
+  } 
+}
+
+//-----------------------------------------------------------------------------
+// channelsProximal()
+//-----------------------------------------------------------------------------
+// inserts channels in the proximal dendrites
+
+proc channelsProximal() {
+  
+  forsec proximal {
+
+    // Hodgkin-Huxley Na & K currents
+    if (hh_prox) {
+    	insert hh2
+    		gnabar_hh2 = gnabar_prox
+    		gkbar_hh2  = gkbar_prox
+    		vtraub_hh2 = vtraub_prox
+    }
+   
+   // Voltage Gated Calcium Channels
+   if (vgcc_prox) {
+    	insert cat
+    		gcatbar_cat = gcatbar_prox
+    	insert calL
+    		gcalbar_calL = gcalbar_prox
+      insert cad
+    }
+  } 
+}
+
+//-----------------------------------------------------------------------------
+// channelsMiddle()
+//-----------------------------------------------------------------------------
+// inserts channels in the middle dendrites
+
+proc channelsMiddle() {
+  
+  forsec middle {
+
+    // Hodgkin-Huxley Na & K currents
+    if (hh_mid) {
+    	insert hh2
+    		gnabar_hh2 = gnabar_mid
+    		gkbar_hh2  = gkbar_mid
+    		vtraub_hh2 = vtraub_mid
+    }
+   
+   // Voltage Gated Calcium Channels
+   if (vgcc_mid) {
+    	insert cat
+    		gcatbar_cat = gcatbar_mid
+    	insert calL
+    		gcalbar_calL = gcalbar_mid
+      insert cad
+    }
+  } 
+}
+
+//-----------------------------------------------------------------------------
+// channelsDistal()
+//-----------------------------------------------------------------------------
+// inserts channels in the distal dendrites
+
+proc channelsDistal() {
+  
+  forsec distal {
+
+    // Hodgkin-Huxley Na & K currents
+    if (hh_dist) {
+    	insert hh2
+    		gnabar_hh2 = gnabar_dist
+    		gkbar_hh2  = gkbar_dist
+    		vtraub_hh2 = vtraub_dist
+    }
+   
+   // Voltage Gated Calcium Channels
+   if (vgcc_dist) {
+    	insert cat
+    		gcatbar_cat = gcatbar_dist
+    	insert calH
+    		gcalbar_calH = gcalbar_dist
+      insert cad
+    }
+  } 
+}
+
+//////////////////// procedure calls /////////////////////////////////////
+
+// create the ion-channels throughout the cell
+channelsSoma()
+channelsProximal()
+channelsMiddle()
+channelsDistal()

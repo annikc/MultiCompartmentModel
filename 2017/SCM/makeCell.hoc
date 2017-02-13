@@ -1,0 +1,13 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeCell.hoc: upper-level script to build the cell; makeGeometry.hoc,
+//               makeIonChannels.hoc and makeSynapses.hoc do the grunt work
+///////////////////////////////////////////////////////////////////////////////
+
+// create the cell's geometry, ion channel properties, and synapses
+xopen("makeSingleCompartmentGeometry.hoc")
+xopen("makeIons.hoc")
+xopen("makeTransporters.hoc")
+xopen("makeActiveChannels.hoc")
+xopen("makePairedUnpaired.hoc")
+
+mkcc2i0_mkcc2_ion = memb_KCC2 + membp_KCC2

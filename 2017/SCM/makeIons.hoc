@@ -1,0 +1,67 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeIons.hoc: creates ions for the model
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// procedure definitions ////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// setIonParameters()
+//-----------------------------------------------------------------------------
+// sets the ion parameters for each segment inserting mechanisms given in mod files
+
+proc setIonParameters() {
+
+  // set the soma parameters
+  forsec somatic {
+
+    // insert the ion mechanisms
+    insert k_ion
+    insert na_ion
+    insert hco3_ion
+    insert cl_ion
+    insert ca_ion
+
+    insert pas
+    	e_pas = el_soma
+    	g_pas = gl_soma
+
+
+    }
+}
+
+
+//////////////////// procedure calls /////////////////////////////////////
+
+
+// register the new ions with NEURON
+cltype    = ion_register("cl",-1)
+hco3type  = ion_register("hco3",-1)
+catype    = ion_register("ca",2)
+
+
+// set the ion parameters throughout the cell
+setIonParameters()
+
+// tell neuron how to treat them during the simulation
+                            //ion_style("name", c_style, e_style, einit, eadvance, cinit)
+                             // c_style-concentration: [0, 1, 2, 3] (UNUSED, PARAMETER, ASSIGNED, STATE)
+                              // e_style - reversal pot: [0, 1, 2, 3] (UNUSED, PARAMETER, ASSIGNED, STATE)
+                              // einit: [0, 1] (If 1 then reversal potential computed by Nernst equation on call to finitialize() using values of concentrations.)
+                              // eadvance: [0, 1] (If 1 then reversal potential computed every call to fadvance() using the values of the concentrations)
+                              //cinit: [0, 1] (If 1 then a call to finitialize() sets the concentrations to the values of the global initial concentrations. eg. nai set to nai0_na_ion and nao set to nao0_na_ion.)
+forall {
+	kstyle      = ion_style("k_ion",1,2,1,0,1)            // k, na, hco3 all parameters; set and forget
+	nastyle     = ion_style("na_ion",1,2,1,0,1)           // cl is a state variable
+	clstyle     = ion_style("cl_ion",3,2,1,1,1)
+	hco3style   = ion_style("hco3_ion",1,2,1,0,1)
+	castyle     = ion_style("ca_ion",3,2,1,0,1)
+}
+
+forall {
+	ki = ki0_k_ion        
+	ko = ko0_k_ion        
+	nai = nai0_na_ion      
+	nao = nao0_na_ion           
+	hco3i = hco3i0_hco3_ion  
+	hco3o = hco3o0_hco3_ion     
+}

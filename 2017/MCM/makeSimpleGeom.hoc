@@ -1,0 +1,123 @@
+proc celldef() {
+  topol()
+  subsets()
+  geom()
+  biophys()
+  geom_nseg()
+  distance()
+}
+
+create soma, dend[14]
+
+proc topol() { local i
+  connect dend(0), soma(1)
+  for i = 1, 2 connect dend[i](0), dend(1)
+  for i = 3, 4 connect dend[i](0), dend[1](1)
+  for i = 5, 6 connect dend[i](0), dend[2](1)
+  connect dend[7](0), soma(0)
+  for i = 8, 9 connect dend[i](0), dend[7](1)
+  for i = 10, 11 connect dend[i](0), dend[8](1)
+  for i = 12, 13 connect dend[i](0), dend[9](1)
+  basic_shape()
+}
+proc basic_shape() {
+  soma {pt3dclear() pt3dadd(0, 0, 0, 1) pt3dadd(15, 0, 0, 1)}
+  dend {pt3dclear() pt3dadd(15, 0, 0, 1) pt3dadd(45, 30, 0, 1)}
+  dend[1] {pt3dclear() pt3dadd(45, 30, 0, 1) pt3dadd(30, 60, 0, 1)}
+  dend[2] {pt3dclear() pt3dadd(45, 30, 0, 1) pt3dadd(90, 30, 0, 1)}
+  dend[3] {pt3dclear() pt3dadd(30, 60, 0, 1) pt3dadd(0, 75, 0, 1)}
+  dend[4] {pt3dclear() pt3dadd(30, 60, 0, 1) pt3dadd(45, 90, 0, 1)}
+  dend[5] {pt3dclear() pt3dadd(90, 30, 0, 1) pt3dadd(105, 60, 0, 1)}
+  dend[6] {pt3dclear() pt3dadd(90, 30, 0, 1) pt3dadd(120, 0, 0, 1)}
+  dend[7] {pt3dclear() pt3dadd(0, 0, 0, 1) pt3dadd(-29, 30, 0, 1)}
+  dend[8] {pt3dclear() pt3dadd(-29, 30, 0, 1) pt3dadd(-44, 60, 0, 1)}
+  dend[9] {pt3dclear() pt3dadd(-29, 30, 0, 1) pt3dadd(-89, 30, 0, 1)}
+  dend[10] {pt3dclear() pt3dadd(-44, 60, 0, 1) pt3dadd(-74, 75, 0, 1)}
+  dend[11] {pt3dclear() pt3dadd(-44, 60, 0, 1) pt3dadd(-29, 90, 0, 1)}
+  dend[12] {pt3dclear() pt3dadd(-89, 30, 0, 1) pt3dadd(-119, 60, 0, 1)}
+  dend[13] {pt3dclear() pt3dadd(-89, 30, 0, 1) pt3dadd(-119, 0, 0, 1)}
+}
+
+objref all, somatic, proximal, middle, distal
+objref proximal_indices, middle_indices, distal_indices
+
+proc subsets() { local i
+  all = new SectionList()
+    soma all.append()
+    for i=0, 13 dend[i] all.append()
+
+  somatic = new SectionList()
+    soma somatic.append()
+
+  proximal = new SectionList()
+  proximal_indices = new Vector()
+    dend proximal.append()
+    dend[7] proximal.append()
+    proximal_indices.append(0)
+    proximal_indices.append(7)
+
+  middle = new SectionList()
+  middle_indices = new Vector()
+    for i=1, 2 dend[i] middle.append()
+    for i=8, 9 dend[i] middle.append()
+    middle_indices.append(1)
+    middle_indices.append(2)
+    middle_indices.append(8)
+    middle_indices.append(9)
+
+  distal = new SectionList()
+  distal_indices = new Vector()
+    for i=3, 6 dend[i] distal.append()
+    for i=10, 13 dend[i] distal.append()
+    distal_indices.append(3)
+    distal_indices.append(4)
+    distal_indices.append(5)
+    distal_indices.append(6)
+    distal_indices.append(10)
+    distal_indices.append(11)
+    distal_indices.append(12)
+    distal_indices.append(13)
+
+}
+proc geom() {
+  soma.diam = 12.76
+  soma.L = 0.01
+}
+proc geom_nseg() {
+
+  // for calculating segment numbers
+  freq = 100      // Hz, frequency at which AC length constant will be computed   // in this proc, number of segments is a function of "freq"
+  d_lambda = 0.1
+
+  forall {                                      // nseg is the integer value of the calculation in the brackets
+
+    nseg  = int((L/(d_lambda*lambda_f(freq))+0.9)/2)*20 + 11            // *** what is lambda_f(something)? how to parse this eq'n? 
+  }
+}
+
+proc biophys() {
+
+  forsec somatic { 
+    cm = cm_soma
+    Ra = Ra_soma
+  }
+
+  forsec proximal { 
+    cm = cm_prox
+    Ra = Ra_prox
+  }
+
+  forsec middle { 
+    cm = cm_mid
+    Ra = Ra_mid
+  }
+
+  forsec distal { 
+    cm = cm_dist
+    Ra = Ra_dist
+  }
+}
+
+access soma
+
+celldef()

@@ -1,0 +1,39 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeActiveChannels.hoc: inserts active ion channels into each section
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// procedure definitions ////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// channelsSoma()
+//-----------------------------------------------------------------------------
+// inserts channels in the soma
+
+proc channelsSoma() {
+
+  forsec somatic {
+
+	// Hodgkin-Huxley Na & K currents
+	if (hh_soma) {
+		insert hh2
+			gnabar_hh2 = gnabar_soma
+			gkbar_hh2  = gkbar_soma
+			vtraub_hh2 = vtraub_soma
+	}
+   
+   // Voltage Gated Calcium Channels
+   if (vgcc_soma) {
+	insert cat
+		gcatbar_cat = gcatbar_soma
+	insert calL
+		gcalbar_calL = gcalbar_soma
+	insert cad
+	}
+
+  } 
+}
+
+//////////////////// procedure calls /////////////////////////////////////
+
+// create the ion-channels throughout the cell
+channelsSoma()

@@ -1,0 +1,248 @@
+///////////////////////////////////////////////////////////////////////////////
+// setParameters.hoc: sets all the user adjustable parameters for the model
+///////////////////////////////////////////////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// global parameters
+
+	// built in parameters 
+		v_init            = -70     // mV												
+		tstop             = 40500  // ms  				FOR PLASTICITY INDUCTION PROTOCOL OF 20s														
+		dt                = 0.025   // ms														
+		celsius           = 36      // C degrees										
+	// custom parameters 											from makeIons.hoc  
+		ki0_k_ion         = 140     // mM 				(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)							
+		ko0_k_ion         = 5       // mM 				(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)							
+		nai0_na_ion       = 10      // mM (range 5-15)	(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)							
+		nao0_na_ion       = 145     // mM 				(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)							
+		cli0_cl_ion       = 4       // mM (range 4-30)	(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)							
+		clo0_cl_ion       = 110     // mM 				(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)							
+		cai0_ca_ion		  = 1e-4// mM 				(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)
+		cao0_ca_ion 	  = 1.5 	// mM 				(as given in  "Neuroscience" 2e, Sinauer- ISBN  9780878937424)
+		hco3i0_hco3_ion   = 15 // 24      // mM 				(as given in  Kaila et al. Review 1994, p 510) 
+		hco3o0_hco3_ion   = 25      // mM 				(as given in  Kaila et al. Review 1994, p 510)
+
+//-----------------------------------------------------------------------------
+// morphological parameters  										to makeGeometry.hoc
+		proximal_limit	= 100 // um (limit of "proximal" distances in apical dendrites) 	
+		middle_limit	= 600 // um (limit of "middle" distances in apical dendrites)	
+
+//-----------------------------------------------------------------------------
+// biophysical parameters 											from makeGeometry.hoc - proc biophys()
+	
+	// somatic section
+		cm_soma	= 1       // uF/cm^2 					(as given in Saraga et al. 2008, J Neurosci.) 											
+		Ra_soma	= 34.5    // Ohm*cm 					(NEURON defaults)
+	// proximal dendritic section
+		cm_prox = 1       // uF/cm^2 					(as given in Saraga et al. 2008, J Neurosci.)
+		Ra_prox = 34.5    // Ohm*cm 					(NEURON defaults)
+	// middle dendritic section
+		cm_mid 	= 1       // uF/cm^2 					(as given in Saraga et al. 2008, J Neurosci.)
+		Ra_mid 	= 34.5    // Ohm*cm 					(NEURON defaults)
+	// distal dendritic section
+		cm_dist	= 1       // uF/cm^2 					(as given in Saraga et al. 2008, J Neurosci.)
+		Ra_dist = 34.5    // Ohm*cm 					(NEURON defaults)
+
+//-----------------------------------------------------------------------------
+// ion parameters 													from .mod files {kleak, naleak, KCC2} to makeIons.hoc, makeTransporters.hoc
+	// somatic section 
+		// leak parameters 
+			gl_soma 		= 0.00001		// S/cm^2				
+			el_soma			= -70 		// mV
+		// chloride parameters											
+			axD_soma        = 2     	// um^2/ms  (http://www.nature.com/articles/srep23196; Kuner & Augustine Neuron 2000)
+	
+	// proximal dendritic section
+		// leak parameters
+			gl_prox 		= 0.00001		// S/cm^2
+			el_prox			= -70 		// mV
+		// chloride parameters
+			axD_prox        = 2     	// um^2/ms 				 								
+	
+	// middle dendritic section
+		// leak parameters
+			gl_mid  		= 0.00001		// S/cm^2
+			el_mid			= -70 		// mV
+		// chloride parameters
+			axD_mid        = 2    		// um^2/ms 	 										
+	
+	// distal dendritic section
+		// leak parameters
+			gl_dist  		= 0.00001		// S/cm^2
+			el_dist			= -70 		// mV
+		// chloride parameters
+			axD_dist        = 2      	// um^2/ms 	 											
+
+//-----------------------------------------------------------------------------
+// active ion channel parameters 									from .mod files {HH, cat, calL, calH} to makeActiveChannels.hoc
+	// somatic section
+		// Hodgkin-Huxley Na & K currents
+			hh_soma         = 1    		// Boolean: 0 = no HH in soma, 1 = HH in soma
+			gnabar_soma     = 1.120		// S/cm^2 			(as given in Saraga et al. 2008, J Neurosci.) 										  	
+			gkbar_soma      = 0.05		// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 			 
+			vtraub_soma     = -60  		// mV 												 
+		// Calcium Currents 								(as given in Poirazi et al., 2003, Neuron)
+			vgcc_soma		= 1 		// Boolean: 0 = no VGCC in soma, 1 = VGCC in soma 	
+			gcatbar_soma	= 3.8e-3 	// mho/cm^2 
+			gcalbar_soma	= 0//7.6e-3		// mho/cm^2  Low activation threshold L-type channel
+	
+	
+	// proximal dendritic section
+		// Hodgkin-Huxley Na & K currents
+			hh_prox         = 1    		// Boolean: 0 = no HH in prox, 1 = HH in prox
+			gnabar_prox     = 1.120 	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 
+			gkbar_prox      = 0.05		// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.) 
+			vtraub_prox     = -60  		// mV
+		// Calcium Currents 									(as given in Poirazi et al., 2003, Neuron)
+			vgcc_prox		= 1 		// Boolean: 0 = no VGCC in prox, 1 = VGCC in prox 	
+			gcatbar_prox	= 3.8e-3//0 		// mho/cm^2 
+			gcalbar_prox	= 0//0.0316e-3 // mho/cm^2  Low activation threshold L-type channel
+	
+	
+	// middle dendritic section
+		// Hodgkin-Huxley Na & K currents	
+			hh_mid        	= 1     	// Boolean: 0 = no HH in mid, 1 = HH in mid
+			gnabar_mid    	= 1.120	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.)
+			gkbar_mid      	= 0.05 	// S/cm^2				(as given in Saraga et al. 2008, J Neurosci.)
+			vtraub_mid     	= -60   	// mV 					
+		// Calcium Currents 									(as given in Poirazi et al., 2003, Neuron)
+			vgcc_mid		= 1 		// Boolean: 0 = no VGCC in mid, 1 = VGCC in mid 	
+			gcatbar_mid		= 3.8e-3//0.514e-3 	// mho/cm^2 
+			gcalbar_mid		= 0//1.4536e-3 // mho/cm^2  Low activation threshold L-type channel
+	
+	
+	// distal dendritic section
+		// Hodgkin-Huxley Na & K currents
+			hh_dist         = 1    		// Boolean: 0 = no HH in dist, 1 = HH in dist
+			gnabar_dist     = 1.120	// S/cm^2 				(as given in Saraga et al. 2008, J Neurosci.)
+			gkbar_dist      = 0.05		// S/cm^2				(as given in Saraga et al. 2008, J Neurosci.)
+			vtraub_dist     = -60  		// mV
+		// Calcium Currents 									(as given in Poirazi et al., 2003, Neuron)
+			vgcc_dist		= 1 		// Boolean: 0 = no VGCC in dist, 1 = VGCC in dist 	from cat.mod, calL.mod
+			gcatbar_dist	= 3.8e-3 //1.029e-3 	// mho/cm^2 
+			gcalbar_dist	= 0// 1.4536e-3 // mho/cm^2  High activation threshold L-type channel
+
+//-----------------------------------------------------------------------------
+// transporter parameters 											from .mod files {KCC2_Trans} to makeTransporters.hoc
+	// somatic section
+		// KCC2 Potassium-Chloride Cotransporter
+			KCC2_soma 		= 1 			// Boolean: 0 = no KCC2 in soma, 1 = KCC2 in soma 	
+			Michaelis_soma	= 29.8			// (mM)     < 0, 1e9 > : Michaelis constant for KCC2 ion transport
+			transp_soma		= 5.07	    	// (/s)     < 0, 1e9 > : rate of transport of KCC2-bound ions across the membrane
+	
+	// proximal dendritic section
+		// KCC2 Potassium-Chloride Cotransporter
+			KCC2_prox 		= 1 			// Boolean: 0 = no KCC2 in prox, 1 = KCC2 in prox 	
+			Michaelis_prox	= 29.8			// (mM) < 0, 1e9 > : Michaelis constant for KCC2 ion transport
+			transp_prox		= 5.07	    	// (/s)     < 0, 1e9 > : rate of transport of KCC2-bound ions across the membrane
+	
+	// middle dendritic section
+		// KCC2 Potassium-Chloride Cotransporter
+			KCC2_mid 		= 1			// Boolean: 0 = no KCC2 in mid, 1 = KCC2 in mid 	
+			Michaelis_mid	= 29.8			// (mM)  < 0, 1e9 > : Michaelis constant for KCC2 ion transport
+			transp_mid		= 5.07	    	// (/s)      < 0, 1e9 > : rate of transport of KCC2-bound ions across the membrane
+	
+	// distal dendritic section
+		// KCC2 Potassium-Chloride Cotransporter
+			KCC2_dist 		= 1 			// Boolean: 0 = no KCC2 in dist, 1 = KCC2 in dist	
+			Michaelis_dist	= 29.8			// (mM)< 0, 1e9 > : Michaelis constant for KCC2 ion transport
+			transp_dist		= 5.07	    	// (/s)    < 0, 1e9 > : rate of transport of KCC2-bound ions across the membrane
+
+//-----------------------------------------------------------------------------
+// kinase/phosphatase parameters 									from .mod files {KCC2} to makeTransporters.hoc
+	// somatic section
+		alpha_soma		= 0.2533		// (/s) < 0, 1e9 > alpha
+		beta_soma	   	= 1.4776		// (/s) < 0, 1e9 > beta
+		R_m_soma		= 1 	 		// (/s) < 0, 1e9 > R_M
+		R_mp_soma	 	= 0.0969760285	// (/s) < 0, 1e9 > R_Mp
+		R_k_soma	   	= 2.37e-3		// (mM) < 0, 1e9 > R_k   (From Kohout 2002)
+		R_p_soma	   	= 7.943e-4		// (mM) < 0, 1e9 > R_p   ([***] Need reference)
+		maxK_soma	   	= 390 			// (/s) < 0, 1e9 > V_ak  (From Kohout 2002)
+		maxP_soma	   	= 74			// (/s) < 0, 1e9 > V_ap  (hand tuned parameter from plot3dkapa.py)
+		HillK_soma	   	= 1.5			// (1)  < 0, 1e9 > h_k   (From Kohout 2002)
+		HillP_soma	   	= 2.9			// (1)  < 0, 1e9 > h_p   (From Stemmer & Klee 1994)
+		inactK_soma	  	= 32.1			// (/s) < 0, 1e9 > v_ik  (From Kohout 2002)
+		inactP_soma	   	= 10			// (/s) < 0, 1e9 > v_ip  (hand tuned parameter from plot3dkapa.py)
+
+	// proximal dendritic section
+		alpha_prox		= 0.2533		// (/s) < 0, 1e9 > alpha
+		beta_prox	   	= 1.4776		// (/s) < 0, 1e9 > beta
+		R_m_prox		= 1 	 		// (/s) < 0, 1e9 > R_M
+		R_mp_prox	 	= 0.0969760285	// (/s) < 0, 1e9 > R_Mp
+		R_k_prox	   	= 2.37e-3		// (mM) < 0, 1e9 > R_k   (From Kohout 2002)
+		R_p_prox	   	= 7.943e-4		// (mM) < 0, 1e9 > R_p   ([***] Need reference)
+		maxK_prox	   	= 390 			// (/s) < 0, 1e9 > V_ak  (From Kohout 2002)
+		maxP_prox	   	= 74			// (/s) < 0, 1e9 > V_ap  (hand tuned parameter from plot3dkapa.py)
+		HillK_prox	   	= 1.5			// (1)  < 0, 1e9 > h_k   (From Kohout 2002)
+		HillP_prox	   	= 2.9			// (1)  < 0, 1e9 > h_p   (From Stemmer & Klee 1994)
+		inactK_prox	  	= 32.1			// (/s) < 0, 1e9 > v_ik  (From Kohout 2002)
+		inactP_prox	   	= 10			// (/s) < 0, 1e9 > v_ip  (hand tuned parameter from plot3dkapa.py)
+
+	// middle dendritic section
+		alpha_mid		= 0.2533		// (/s) < 0, 1e9 > alpha
+		beta_mid	   	= 1.4776		// (/s) < 0, 1e9 > beta
+		R_m_mid			= 1 	 		// (/s) < 0, 1e9 > R_M
+		R_mp_mid	 	= 0.0969760285	// (/s) < 0, 1e9 > R_Mp
+		R_k_mid	   		= 2.37e-3		// (mM) < 0, 1e9 > R_k   (From Kohout 2002)
+		R_p_mid	   		= 7.943e-4		// (mM) < 0, 1e9 > R_p   ([***] Need reference)
+		maxK_mid	   	= 390 			// (/s) < 0, 1e9 > V_ak  (From Kohout 2002)
+		maxP_mid	   	= 74			// (/s) < 0, 1e9 > V_ap  (hand tuned parameter from plot3dkapa.py)
+		HillK_mid	   	= 1.5			// (1)  < 0, 1e9 > h_k   (From Kohout 2002)
+		HillP_mid	   	= 2.9			// (1)  < 0, 1e9 > h_p   (From Stemmer & Klee 1994)
+		inactK_mid	  	= 32.1			// (/s) < 0, 1e9 > v_ik  (From Kohout 2002)
+		inactP_mid	   	= 10			// (/s) < 0, 1e9 > v_ip  (hand tuned parameter from plot3dkapa.py)
+
+	// distal dendritic section
+		alpha_dist		= 0.2533		// (/s) < 0, 1e9 > alpha
+		beta_dist	   	= 1.4776		// (/s) < 0, 1e9 > beta
+		R_m_dist		= 1 	 		// (/s) < 0, 1e9 > R_M
+		R_mp_dist	 	= 0.0969760285	// (/s) < 0, 1e9 > R_Mp
+		R_k_dist	   	= 2.37e-3		// (mM) < 0, 1e9 > R_k   (From Kohout 2002)
+		R_p_dist	   	= 7.943e-4		// (mM) < 0, 1e9 > R_p   ([***] Need reference)
+		maxK_dist	   	= 390 			// (/s) < 0, 1e9 > V_ak  (From Kohout 2002)
+		maxP_dist	   	= 74			// (/s) < 0, 1e9 > V_ap  (hand tuned parameter from plot3dkapa.py)
+		HillK_dist	   	= 1.5			// (1)  < 0, 1e9 > h_k   (From Kohout 2002)
+		HillP_dist	   	= 2.9			// (1)  < 0, 1e9 > h_p   (From Stemmer & Klee 1994)
+		inactK_dist	  	= 32.1			// (/s) < 0, 1e9 > v_ik  (From Kohout 2002)
+		inactP_dist	   	= 10			// (/s) < 0, 1e9 > v_ip  (hand tuned parameter from plot3dkapa.py)
+
+//-----------------------------------------------------------------------------
+
+//synaptic parameters 												from makePairedUnpaired.hoc; "foo_prompt" set in promptWindow.hoc
+	// paired synapses
+		location_paired 	= location_paired_prompt	// soma = 0, prox = 1, mid = 2, dist = 3
+		interval_paired		= interval_paired_prompt    // ms/spike 								
+		number_paired		= number_paired_prompt		// total number of spikes 					
+		start_paired		= start_paired_prompt		// ms 										
+		noise_paired		= noise_paired_prompt		// Boolean: 0 = noiseless, 1 = Poisson 		
+		//GABAa maximal conductance
+		gmax_paired_soma	= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
+		gmax_paired_prox	= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
+		gmax_paired_mid		= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
+		gmax_paired_dist	= 0.00053  // (uS)	(as given in http://www.ncbi.nlm.nih.gov/pubmed/9214504)
+	// unpaired synapses
+		location_unpaired 	= location_paired_prompt		// soma = 0, prox = 1, mid = 2, dist = 3
+		interval_unpaired	= interval_unpaired_prompt		// ms/spike 							
+		number_unpaired		= number_unpaired_prompt		// total number of spikes 				
+		start_unpaired 		= start_unpaired_prompt		  	// ms 									
+		noise_unpaired		= noise_unpaired_prompt			// Boolean: 0 = noiseless, 1 = Poisson 
+		//GABAa maximal conductance
+		gmax_unpaired_soma	= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
+		gmax_unpaired_prox	= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
+		gmax_unpaired_mid	= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
+		gmax_unpaired_dist	= 0.025  // (uS)	(as given in Macaferri et al. 2000, J physiol.)
+
+//-----------------------------------------------------------------------------
+// synaptic densities												from makePairedUnpaired.hoc; "foo_prompt" set in promptWindow.hoc
+		density_paired		= density_paired_prompt 	//number of synapses / um^2 of membrane 
+		density_unpaired 	= density_unpaired_prompt 	//number of synapses / um^2 of membrane
+		
+//-----------------------------------------------------------------------------
+// clamp parameters 												from makeClamp.hoc
+		clamp_amp 			= clamp_amp_prompt		// (nA)
+		clamp_dur 			= clamp_dur_prompt		// (ms)
+		clamp_interval		= clamp_int_prompt		// (ms) time between current injections
+		clamp_number  		= clamp_num_prompt		// total number of current injections	
+		//clamp_start			= start_paired + 1		// (ms)			
+		//print "Clamp Start (setParamters) = ", clamp_start			
+		clamp_noise			= clamp_noise_prompt	// Boolean: 0 = noiseless, 1 = Poisson 

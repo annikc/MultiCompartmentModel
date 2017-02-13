@@ -1,0 +1,41 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeTransporters.hoc: inserts active ion transporters into each section
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// procedure definitions ////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// transportersSoma()
+//-----------------------------------------------------------------------------
+// inserts transporters in the soma
+
+proc transportersSoma() {
+  forsec somatic {
+    // KCC2 Co-transporters
+    if (KCC2_soma) {
+    	insert KCC2 																					// from KCC2.mod
+			A_M_KCC2  = alpha_soma					// (/s) rate of transfer from cytosolic to membrane-bound KCC2
+			B_M_KCC2  = beta_soma   					// (/s) rate of transfer from membrane-bound to cytosolic KCC2
+			R_M_KCC2  = R_m_soma   				// (/s) KCC2 dephosphorylation coefficient
+			R_MP_KCC2 = R_mp_soma   				// (/s) KCC2 phosphorylation coefficient
+			R_K_KCC2  = R_k_soma   					// (mM) concent. of Ca2+ at which kinase activation rate is half max
+			R_P_KCC2  = R_p_soma   					// (mM) concent. of Ca2+ at which phosphatase activation rate is half max
+			V_K_KCC2  = maxK_soma   					// (/s) maximum rate of kinase activation
+			V_P_KCC2  = maxP_soma   					// (/s) maximum rate of phosphatase activation
+			H_K_KCC2  = HillK_soma   					// (1) Hill coefficient for kinase activation equation
+			H_P_KCC2  = HillP_soma   					// (1) Hill coefficient for phosphatase activation equation
+			B_K_KCC2  = inactK_soma  					// (/s) rate of kinase inactivation
+			B_P_KCC2  = inactP_soma   					// (/s) rate of phosphatase inactivation
+      	insert KCC2_Transport 																			// from KCC2_Trans.mod
+			axD_KCC2_Transport 		= axD_soma     		// um^2/ms 											
+			R_T_KCC2_Transport		= Michaelis_soma    // (mM)     < 0, 1e9 > : Michaelis constant for KCC2 ion transport
+			r_T_KCC2_Transport    	= transp_soma    	// (/s)     < 0, 1e9 > : rate of transport of KCC2-bound ions across the membrane
+		}
+  	}
+}
+
+
+//////////////////// procedure calls /////////////////////////////////////
+
+// create the ion-transporters throughout the cell
+transportersSoma()

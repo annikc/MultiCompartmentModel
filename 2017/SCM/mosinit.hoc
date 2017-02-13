@@ -1,0 +1,423 @@
+////////////////////////////////////////////////////////////////////////////////
+// COMMENTS  
+// 
+// in set parameters we changed bicarb -- change it back? different citation?
+// 
+// Not opening file correctly. Need to create directory for data?
+// 
+
+//////////////////// set the random number generator //////////////////////////
+use_mcell_ran4(0)                                                                   
+
+//////////////////// model and interface scripts //////////////////////////////
+xopen("setParameters.hoc")
+xopen("makeCell.hoc")
+xopen("makeWindows.hoc")
+
+
+strdef filename
+objref runfile
+
+// create vectors to store header information 
+objref main_head, list_head, sec_head
+objref soma_count
+
+soma_count = new Vector()
+
+
+//create lists to store lists of sections
+objref soma_ecl, soma_KCC2_membp, soma_calc, soma_act_kin, soma_act_phos
+
+//create vectors to store data for writing
+objref Ecl_info, KCC2_MP_info, Ca_info, kin_info, phos_info
+
+//create vector for storing spike timingg interval values
+objref timesteps
+timesteps = new Vector()
+
+proc add_timestep(){
+	timesteps.append(-50) //,-15,-10,-5,-4,-3,-2,-1,0,1,2,3,4,5,10,15,25,50)
+}
+add_timestep()
+
+
+// finalize vectors to store data values
+Ecl_info 	 = new Vector()
+KCC2_MP_info = new Vector()
+Ca_info 	 = new Vector()
+kin_info 	 = new Vector()
+phos_info 	 = new Vector()
+
+
+// the sampling frequency for recording (in Hz)
+rsamp = 2000                // sampling frequency 
+rstep = 1/(rsamp/1000)      // don't change this, it is the time per sample in milliseconds
+nstep = tstop*(rsamp/1000)  // don't change this, it is the number of samples per run, used to set aside space in memory for each vector
+ind_start = 0.1*nstep 		// beginning of plasticity induction interval, based on start time of 10000 ms in a 100000 ms run
+ind_end = (0.4*nstep)-1		// end of plasticity induction interval, based on induction for 30s in a 100000 ms run
+
+proc data_init(){
+	
+	// declare the lists and vectors to store the data and set them to recors
+	soma_ecl		= new List()
+	soma_KCC2_membp = new List()
+	soma_calc 		= new List()
+	soma_act_kin	= new List()
+	soma_act_phos	= new List()
+	print "Initializing somatic collection data"
+	forsec somatic {
+		// vector to count # of section in sectionlist "soma"
+		soma_count.append(1)
+		// store data for Cl- reversal 
+		soma_ecl.append(new List())
+		for (x,0) {
+			soma_ecl.o(soma_ecl.count()-1).append(new Vector(nstep))
+			soma_ecl.o(soma_ecl.count()-1).o(soma_ecl.o(soma_ecl.count()-1).count()-1).record(&cyt_KCC2(x),rstep)
+		}
+
+		// store data for membrane phosphorylated KCC2 
+		soma_KCC2_membp.append(new List())
+		for (x,0) {
+			soma_KCC2_membp.o(soma_KCC2_membp.count()-1).append(new Vector(nstep))
+			soma_KCC2_membp.o(soma_KCC2_membp.count()-1).o(soma_KCC2_membp.o(soma_KCC2_membp.count()-1).count()-1).record(&membp_KCC2(x),rstep)
+		}
+
+		// store data for calcium concentration 
+		soma_calc.append(new List())
+		for (x,0) {
+			soma_calc.o(soma_calc.count()-1).append(new Vector(nstep))
+			soma_calc.o(soma_calc.count()-1).o(soma_calc.o(soma_calc.count()-1).count()-1).record(&cai(x),rstep)
+		}
+
+		// store data for active kinase
+		soma_act_kin.append(new List())
+		for (x,0) {
+			soma_act_kin.o(soma_act_kin.count()-1).append(new Vector(nstep))
+			soma_act_kin.o(soma_act_kin.count()-1).o(soma_act_kin.o(soma_act_kin.count()-1).count()-1).record(&kin_active_KCC2(x),rstep)
+		}
+
+		// store data for active phosphatase
+		soma_act_phos.append(new List())
+		for (x,0) {
+			soma_act_phos.o(soma_act_phos.count()-1).append(new Vector(nstep))
+			soma_act_phos.o(soma_act_phos.count()-1).o(soma_act_phos.o(soma_act_phos.count()-1).count()-1).record(&phos_active_KCC2(x),rstep)
+		}
+	print "soma ", soma_count.size(), " finished"
+	}
+	soma_count.resize(0)
+
+
+//-----------------------------------------------------------------------------
+// init()
+//-----------------------------------------------------------------------------
+// the finalization procedure for the numerical integrator                        /
+proc init() {                                                                       // sets everything to starting values
+	finitialize(v_init)                                                               // ffinalize takes as an argument voltage of all sections you want it to finalize 
+
+	if (cvode.active()) {  
+		cvode.re_init()
+	} else {
+		fcurrent()
+	}
+	frecord_init()
+	//reseed()
+}
+
+
+objref soma_clreversal
+proc ecl_calculations(){ local a, b, c, d, j, k, l, m
+	soma_seg_ecl_final = 0
+	soma_seg_ecl_initial = 0 
+	soma_clreversal = new Vector()
+
+	for a = 0, soma_ecl.count()-1{
+		for j = 0, soma_ecl.o(i).count()-1 {// over number of objects in the Jth entry of the Ecl list 
+			// recording data just from onset of plasticity induction @10000ms to end @40000ms (corresponding vector indices 2000 and 799)
+			soma_Ecl_initial = soma_ecl.o(i).o(j).x(ind_start)
+				soma_seg_ecl_initial = soma_seg_ecl_initial + soma_Ecl_initial
+			soma_Ecl_final = soma_ecl.o(i).o(j).x(ind_end)
+				soma_seg_ecl_final = soma_seg_ecl_final + soma_Ecl_final
+		}
+		soma_clreversal.append((soma_seg_ecl_final - soma_seg_ecl_initial)/(soma_ecl.o(i).count()))
+	}
+
+}
+
+objref soma_MP
+proc MP_calculations(){ local a, b, c, d, j, k, l, m
+	soma_seg_MP_final = 0
+	soma_seg_MP_initial = 0
+	soma_MP = new Vector()
+
+	for a = 0, soma_KCC2_membp.count()-1{
+		for j = 0, soma_KCC2_membp.o(i).count()-1 {// over number of objects in the Jth entry of the Ecl list 
+			// recording data just from onset of plasticity induction @10000ms to end @40000ms (corresponding vector indices 2000 and 799)
+			soma_MP_initial = soma_KCC2_membp.o(i).o(j).x(ind_start)
+				soma_seg_MP_initial = soma_seg_MP_initial + soma_MP_initial
+			soma_MP_final = soma_KCC2_membp.o(i).o(j).x(ind_end)
+				soma_seg_MP_final = soma_seg_MP_final + soma_MP_final
+		}	
+		soma_MP.append((soma_seg_MP_final - soma_seg_MP_initial)/(soma_KCC2_membp.o(i).count()))
+	}
+
+
+}
+
+objref soma_calcium, prox_calcium, midd_calcium, dist_calcium
+proc cal_calculations(){ local a, b, c, d, j, k, l, m
+	soma_seg_cal_avg = 0
+	soma_calcium = new Vector()
+
+	prox_seg_cal_avg = 0
+	prox_calcium = new Vector()
+
+	midd_seg_cal_avg = 0
+	midd_calcium = new Vector()
+
+	dist_seg_cal_avg = 0 
+	dist_calcium = new Vector()
+
+	for a = 0, soma_calc.count()-1{
+		for j = 0, soma_calc.o(i).count()-1 {// over number of objects in the Jth entry of the Ecl list 
+			// recording data just from onset of plasticity induction @10000ms to end @40000ms (corresponding vector indices 200 and 799)
+			soma_cal_avg = soma_calc.o(i).o(j).at(ind_start, ind_end).mean()
+				soma_seg_cal_avg = soma_seg_cal_avg + soma_cal_avg
+		}
+		soma_calcium.append(soma_seg_cal_avg/soma_calc.o(i).count())
+	}
+
+	for b = 0, prox_calc.count()-1{
+		for k = 0, prox_KCC2_membp.o(i).count()-1{
+			prox_cal_avg = prox_calc.o(i).o(k).at(ind_start, ind_end).mean()
+				prox_seg_cal_avg = prox_seg_cal_avg + prox_cal_avg
+		}
+		prox_calcium.append(prox_seg_cal_avg/prox_calc.o(i).count())
+	}
+	
+	for c = 0, midd_calc.count()-1{
+		for l = 0, midd_KCC2_membp.o(i).count()-1{
+			midd_cal_avg = midd_calc.o(i).o(l).at(ind_start, ind_end).mean()
+				midd_seg_cal_avg = midd_seg_cal_avg + midd_cal_avg
+		}
+		midd_calcium.append(midd_seg_cal_avg/midd_calc.o(i).count())
+	}
+
+	for d = 0, dist_calc.count()-1{
+		for m = 0, dist_KCC2_membp.o(i).count()-1{
+			dist_cal_avg = dist_calc.o(i).o(m).at(ind_start, ind_end).mean()
+				dist_seg_cal_avg = dist_seg_cal_avg + dist_cal_avg
+		}
+		dist_calcium.append(dist_seg_cal_avg/dist_calc.o(i).count())
+	}
+}
+
+objref soma_kin, prox_kin, midd_kin, dist_kin
+proc kin_calculations(){ local a, b, c, d, j, k, l, m
+	soma_seg_kin_final = 0
+	soma_seg_kin_initial = 0
+	soma_kin = new Vector()
+
+	prox_seg_kin_final = 0
+	prox_seg_kin_initial = 0
+	prox_kin = new Vector()
+
+	midd_seg_kin_final = 0
+	midd_seg_kin_initial = 0
+	midd_kin = new Vector()
+
+	dist_seg_kin_final = 0
+	dist_seg_kin_initial = 0
+	dist_kin = new Vector()
+
+	for a = 0, soma_act_kin.count()-1{
+		for j = 0, soma_act_kin.o(i).count()-1 {// over number of objects in the Jth entry of the Ecl list 
+			// recording data just from onset of plasticity induction @10000ms to end @40000ms (corresponding vector indices 2000 and 799)
+			soma_kin_initial = soma_act_kin.o(i).o(j).x(ind_start)
+				soma_seg_kin_initial = soma_seg_kin_initial + soma_kin_initial
+			soma_kin_final = soma_act_kin.o(i).o(j).x(ind_end)
+				soma_seg_kin_final = soma_seg_kin_final + soma_kin_final
+		}
+		soma_kin.append((soma_seg_kin_final - soma_seg_kin_initial)/(soma_KCC2_membp.o(i).count()))
+	}
+	
+	for b = 0, prox_act_kin.count()-1{
+		for k = 0, prox_KCC2_membp.o(i).count()-1{
+			prox_kin_initial = prox_KCC2_membp.o(i).o(k).x(ind_start)
+				prox_seg_kin_initial = prox_seg_kin_initial + prox_kin_initial
+			prox_kin_final = prox_KCC2_membp.o(i).o(k).x(ind_end)
+				prox_seg_kin_final = prox_seg_kin_final + prox_kin_final
+			}
+		prox_kin.append((prox_seg_kin_final - prox_seg_kin_initial)/(prox_KCC2_membp.o(i).count()))
+	}
+	
+	for c = 0, midd_act_kin.count()-1{
+		for l = 0, midd_KCC2_membp.o(i).count()-1{
+			midd_kin_initial = midd_KCC2_membp.o(i).o(l).x(ind_start)
+				midd_seg_kin_initial = midd_seg_kin_initial + midd_kin_initial
+			midd_kin_final = midd_KCC2_membp.o(i).o(l).x(ind_end)
+				midd_seg_kin_final = midd_seg_kin_final + midd_kin_final
+		}
+		midd_kin.append((midd_seg_kin_final - midd_seg_kin_initial)/(midd_KCC2_membp.o(i).count()))
+	}
+	
+	for d = 0, dist_act_kin.count()-1{
+		for m = 0, dist_KCC2_membp.o(i).count()-1{
+			dist_kin_initial = dist_KCC2_membp.o(i).o(m).x(ind_start)
+				dist_seg_kin_initial = dist_seg_kin_initial + dist_kin_initial
+			dist_kin_final = dist_KCC2_membp.o(i).o(m).x(ind_end)
+				dist_seg_kin_final = dist_seg_kin_final + dist_kin_final
+		}
+		dist_kin.append((dist_seg_kin_final - dist_seg_kin_initial)/(dist_KCC2_membp.o(i).count()))
+	}
+}
+
+objref soma_phos, prox_phos, midd_phos, dist_phos
+proc phos_calculations(){ local a, b, c, d, j, k, l, m
+	soma_seg_phos_final = 0
+	soma_seg_phos_initial = 0
+	soma_phos = new Vector()
+
+	prox_seg_phos_final = 0
+	prox_seg_phos_initial = 0
+	prox_phos = new Vector()
+
+	midd_seg_phos_final = 0
+	midd_seg_phos_initial = 0
+	midd_phos = new Vector()
+
+	dist_seg_phos_final = 0
+	dist_seg_phos_initial = 0
+	dist_phos = new Vector()
+
+	for a = 0, soma_act_phos.count()-1{
+		for j = 0, soma_act_phos.o(i).count()-1 {// over number of objects in the Jth entry of the Ecl list 
+			// recording data just from onset of plasticity induction @10000ms to end @40000ms (corresponding vector indices 2000 and 799)
+			soma_phos_initial = soma_act_phos.o(i).o(j).x(ind_start)
+				soma_seg_phos_initial = soma_seg_phos_initial + soma_phos_initial
+			soma_phos_final = soma_act_phos.o(i).o(j).x(ind_end)
+				soma_seg_phos_final = soma_seg_phos_final + soma_phos_final
+		}
+		soma_phos.append((soma_seg_phos_final - soma_seg_phos_initial)/(soma_KCC2_membp.o(i).count()))
+	}
+	
+	for b = 0, prox_act_phos.count()-1{
+		for k = 0, prox_KCC2_membp.o(i).count()-1{
+			prox_phos_initial = prox_KCC2_membp.o(i).o(k).x(ind_start)
+				prox_seg_phos_initial = prox_seg_phos_initial + prox_phos_initial
+			prox_phos_final = prox_KCC2_membp.o(i).o(k).x(ind_end)
+				prox_seg_phos_final = prox_seg_phos_final + prox_phos_final
+		}
+		prox_phos.append((prox_seg_phos_final - prox_seg_phos_initial)/(prox_KCC2_membp.o(i).count()))
+	}
+	
+	for c = 0, midd_act_phos.count()-1{
+		for l = 0, midd_KCC2_membp.o(i).count()-1{
+			midd_phos_initial = midd_KCC2_membp.o(i).o(l).x(ind_start)
+				midd_seg_phos_initial = midd_seg_phos_initial + midd_phos_initial
+			midd_phos_final = midd_KCC2_membp.o(i).o(l).x(ind_end)
+				midd_seg_phos_final = midd_seg_phos_final + midd_phos_final
+		}
+		midd_phos.append((midd_seg_phos_final - midd_seg_phos_initial)/(midd_KCC2_membp.o(i).count()))
+	}
+	
+	for d = 0, dist_act_phos.count()-1{
+		for m = 0, dist_KCC2_membp.o(i).count()-1{
+			dist_phos_initial = dist_KCC2_membp.o(i).o(m).x(ind_start)
+				dist_seg_phos_initial = dist_seg_phos_initial + dist_phos_initial
+			dist_phos_final = dist_KCC2_membp.o(i).o(m).x(ind_end)
+				dist_seg_phos_final = dist_seg_phos_final + dist_phos_final
+		}
+		dist_phos.append((dist_seg_phos_final - dist_seg_phos_initial)/(dist_KCC2_membp.o(i).count()))
+	}
+}
+
+proc write_to_file() {
+	Ecl_info.resize(0)
+	Ecl_info.append(soma_clreversal)
+	Ecl_info.append(prox_clreversal)
+	Ecl_info.append(midd_clreversal)
+	Ecl_info.append(dist_clreversal)
+
+	KCC2_MP_info.resize(0)
+	KCC2_MP_info.append(soma_MP)
+	KCC2_MP_info.append(prox_MP)
+	KCC2_MP_info.append(midd_MP)
+	KCC2_MP_info.append(dist_MP)
+
+	Ca_info.resize(0)
+	Ca_info.append(soma_calcium)
+	Ca_info.append(prox_calcium)
+	Ca_info.append(midd_calcium)
+	Ca_info.append(dist_calcium)
+
+	kin_info.resize(0)
+	kin_info.append(soma_kin)
+	kin_info.append(prox_kin)
+	kin_info.append(midd_kin)
+	kin_info.append(dist_kin)
+
+	phos_info.resize(0)
+	phos_info.append(soma_phos)
+	phos_info.append(prox_phos)
+	phos_info.append(midd_phos)
+	phos_info.append(dist_phos)
+	
+	Ecl_info.vwrite(runfile)
+	KCC2_MP_info.vwrite(runfile)
+	Ca_info.vwrite(runfile)
+	kin_info.vwrite(runfile)
+	phos_info.vwrite(runfile)
+}
+
+
+proc run_sim() {local i, j, step, num_steps
+	for step = 0, timesteps.size()-1 {
+		clamp_start = start_paired + timesteps.x[step]
+		xopen("makeClamp.hoc")
+		data_init()
+		print "Running simulation ", step+1, "of ", timesteps.size(), " (delta t = ", timesteps.x[step], ") for ", syn_loc, "..."
+		run()
+
+		if (step==0){
+			runfile = new File()  // ask on forum about this
+			sprint(filename,"%s/%s.dat",outdir,fprefix)  // ask on forum about this
+			runfile.wopen(filename)  // ask on forum about this
+			runfile.seek(0)  // ask on forum about this
+			
+			// output the main header
+			main_head = new Vector()
+			main_head.append(4)			// # of sectionlists (soma, prox, midd, dist)
+			main_head.append(5) 		// # of variables (Ecl, MP, calc, kin, phos)
+			main_head.append(timesteps.size()) // # of spike tiinitialg intervals
+			main_head.append(soma_count.size()) // # of sections in sectionlist "soma"
+			main_head.append(prox_count.size()) // # of sections in sectionlist "proximal"
+			main_head.append(midd_count.size()) // # of sections in sectionlist "middle"
+			main_head.append(dist_count.size()) // # of sections in sectionlist "distal"
+
+			main_head.vwrite(runfile)
+
+			ecl_calculations()
+			MP_calculations()
+			cal_calculations()
+			kin_calculations()
+			phos_calculations()
+				
+			write_to_file()
+			print "          ... data (delta t = ", timesteps.x[step], ") saved to ", filename
+			runfile.close()
+		} else{
+			// for each section, output header and data
+			runfile.aopen(filename)
+			//output data for Cl- reversal
+			ecl_calculations()
+			MP_calculations()
+			cal_calculations()
+			kin_calculations()
+			phos_calculations()
+			write_to_file()
+			print "          ... data (delta t = ", timesteps.x[step], ") saved to file."
+			runfile.close()
+		}
+	}
+}
+print "          ... cell created successfully."

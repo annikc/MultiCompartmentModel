@@ -1,0 +1,263 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeWindows.hoc: creates the user interface for the simulation
+///////////////////////////////////////////////////////////////////////////////
+
+// ************** DEFAULTS SET FOR INDUCTION PROTOCOL OF 20s *****************
+// ********************* INDUCTION 10s, TESTING 10s **************************
+
+//////////////////// declarations /////////////////////////////////////////////
+objectvar save_window
+{pwman_place(0,0,0)}
+
+//Set Default Labels
+strdef location_paired_string
+location_paired_string = "    Default = Proximal Dendrites"
+
+strdef location_unpaired_string
+location_unpaired_string = "    Soma"
+
+strdef noise_paired_string
+noise_paired_string = "    Noise Off"
+
+strdef noise_unpaired_string
+noise_unpaired_string = "    Noise Off"
+
+strdef location_clamp
+location_clamp = "    Current Clamp in Soma"
+
+strdef clamp_noise_string
+clamp_noise_string = "    Noise Off"
+
+strdef data_type_string
+data_type_string = "    Select Data to Record"
+
+//Print & File Windows Manager
+objref p
+p = new PWManager()
+
+rec_data = 0
+
+//////////////////// procedure calls /////////////////////////////////////
+load_file("nrngui.hoc")
+
+proc cell_maker(){ local c
+	c = p.count()
+	if (c >= 3){
+		for i=1,c-3 {
+			p.close(c - i)
+		}
+	}
+	if (rec_data == 0){
+		xopen("mosinit_RUNonly.hoc")
+	}
+	if (rec_data == 1) {
+		if (data_type_prompt == 0){
+			xopen("mosinit.hoc")
+		}
+	}
+}
+
+
+// Set Parameters for Paired Synapses
+	// Set Location
+	proc set_location_paired () {
+		location_paired_prompt = $1
+		if (location_paired_prompt == 0){
+			location_paired_string = "    Soma"
+		}
+		if (location_paired_prompt == 1){
+			location_paired_string = "    Proximal Dendrite"
+		}
+		if (location_paired_prompt == 2){
+			location_paired_string = "    Middle Dendrite"
+		}
+		if (location_paired_prompt == 3){
+			location_paired_string = "    Distal Dendrite"
+		}
+	}	
+	// Set Noise
+	proc set_noise_paired(){
+		noise_paired_prompt = $1
+		if (noise_paired_prompt == 0){
+			noise_paired_string = "Noise Off"
+		}
+		if (noise_paired_prompt == 1){
+			noise_paired_string = "Noise On"
+		}
+	}									
+
+// Set Parameters for Unpaired Synapses	
+	// Set Location
+	proc set_location_unpaired () {
+		location_unpaired_prompt = $1
+		if (location_unpaired_prompt == 0){
+			location_unpaired_string = "    Soma"
+		}
+		if (location_unpaired_prompt == 1){
+			location_unpaired_string = "    Proximal Dendrite"
+		}
+		if (location_unpaired_prompt == 2){
+			location_unpaired_string = "    Middle Dendrite"
+		}
+		if (location_unpaired_prompt == 3){
+			location_unpaired_string = "    Distal Dendrite"
+		}
+	}						
+	// Set Noise
+	proc set_noise_unpaired(){
+		noise_unpaired_prompt = $1
+		if (noise_unpaired_prompt == 0){
+			noise_unpaired_string = "Noise Off"
+		}
+		if (noise_unpaired_prompt == 1){
+			noise_unpaired_string = "Noise On"
+		}
+	}
+
+// Set Parameters for Current Clamp
+	// Set Noise
+	proc set_noise_clamp(){
+		clamp_noise_prompt = $1
+		if (clamp_noise_prompt == 0){
+			clamp_noise_string = "Noise Off"
+		}
+		if (clamp_noise_prompt == 1){
+			clamp_noise_string = "Noise On"
+		}
+	}
+
+// Set Data Type to be recorded
+	proc set_data_type(){
+		data_type_prompt = $1
+		if (data_type_prompt == 0){
+			data_type_string = "    Record All Data"
+		}
+	}
+
+
+objref hbox
+hbox = new HBox(0)
+hbox.intercept(1)
+xpanel("Specify Parameters")
+	xlabel("PAIRED SYNAPSES")
+		location_paired_prompt = 1
+		xmenu("Location of Paired Synapses") 
+			xradiobutton("Soma", "set_location_paired(0)")
+			xradiobutton("Proximal Dendrite", "set_location_paired(1)")
+			xradiobutton("Middle Dendrite", "set_location_paired(2)")
+			xradiobutton("Distal Dendrite", "set_location_paired(3)")
+		xmenu()
+	 	xvarlabel(location_paired_string) 
+
+		density_paired_prompt = 0.025 // Soma: 12.5/um^2; Proximal: 0.1334/um^2; Middle 0.009/um^2; Distal 0.0025/um^2
+		xvalue("Density of Paired Synapses","density_paired_prompt", 1)
+		
+		interval_paired_prompt = 200
+		xvalue("Interval Between Paired Synapse Spikes","interval_paired_prompt", 1)
+		
+		number_paired_prompt = 150
+		xvalue("Number of Paired Synapse Spikes","number_paired_prompt", 1) 
+		
+		start_paired_prompt = 50
+		xvalue("Start of Paired Synapse Spikes","start_paired_prompt", 1)	
+
+		noise_paired_prompt = 0
+		xmenu("Noise of Paired Synapse Spikes")
+			xradiobutton("Noise Off", "set_noise_paired(0)")
+			xradiobutton("Noise On", "set_noise_paired(1)")
+		xmenu()
+		xvarlabel(noise_paired_string)
+
+		xlabel("       ")
+
+	xlabel("UNPAIRED SYNAPSES")
+		location_unpaired_prompt = 0
+		xmenu("Location of Unpaired Synapses")
+			xradiobutton("Soma", "set_location_unpaired(0)")
+			xradiobutton("Proximal Dendrite", "set_location_unpaired(1)")
+			xradiobutton("Middle Dendrite", "set_location_unpaired(2)")
+			xradiobutton("Distal Dendrite", "set_location_unpaired(3)")
+		xmenu()
+		xvarlabel(location_unpaired_string)
+
+		density_unpaired_prompt = 0
+		xvalue("Density of Unpaired Synapses","density_unpaired_prompt", 1)
+		
+		interval_unpaired_prompt = interval_paired_prompt
+		xvalue("Interval Between Unpaired Synapse Spikes","interval_unpaired_prompt", 1)
+		
+		number_unpaired_prompt = 50
+		xvalue("Number of unpaired Synapse Spikes","number_unpaired_prompt", 1)// increments counter for t by 1 
+		
+		start_unpaired_prompt = 10150
+		xvalue("Start of Unpaired Synapse Spikes","start_unpaired_prompt", 1)	// increments counter for t by 1 
+
+		noise_unpaired_prompt = 0
+		xmenu("Noise of Unpaired Synapse Spikes")
+			xradiobutton("Noise Off", "set_noise_unpaired(0)")
+			xradiobutton("Noise On", "set_noise_unpaired(1)")
+		xmenu()
+		xvarlabel(noise_unpaired_string)
+
+		xlabel("       ")
+
+	xlabel("CURRENT CLAMP")
+		clamp_amp_prompt = 1
+		xvalue("Current Clamp Amp","clamp_amp_prompt", 1)
+		
+		clamp_dur_prompt = 1
+		xvalue("Current Clamp Duration","clamp_dur_prompt", 1)
+
+		clamp_int_prompt = interval_paired_prompt
+		xvalue("Interval Between Current Clamp Events","clamp_int_prompt", 1)
+		
+		clamp_num_prompt = number_paired_prompt
+		xvalue("Number of Current Clamp Events","clamp_num_prompt", 1)
+
+		clamp_noise_prompt = 0
+		xmenu("Noise of Current Clamp") 
+			xradiobutton("Noise Off", "set_noise_unpaired(0)")
+			xradiobutton("Noise On", "set_noise_unpaired(1)")
+		xmenu()
+		xvarlabel(clamp_noise_string)
+
+		xlabel("       ")
+xpanel(15,60,0)
+
+xpanel("Data Collection")
+
+	xlabel("       ")
+	xlabel("       ")
+
+	xlabel("RANDOM SYNAPSE DISTRIBUTION SEED")
+		seed_prompt = 37264
+		xvalue("Seed for Random Number Generator", "seed_prompt", 1)
+
+	xlabel("       ")
+
+	xlabel("DATA RECORDING")
+	xcheckbox("Record Data?", &rec_data)
+	xmenu("Data Type to Record") 
+		xradiobutton("V", "set_data_type(0)")
+		xradiobutton("iCl", "set_data_type(1)")
+		xradiobutton("Cli", "set_data_type(2)")
+		xradiobutton("ECl", "set_data_type(3)")
+		xradiobutton("KCC2 Distribution", "set_data_type(4)")
+		xradiobutton("KCC2@ del T values", "set_data_type(5)")
+		xradiobutton("KCC2 through Ca Values", "set_data_type(6)")
+		xradiobutton("All Data", "set_data_type(7)")
+	xmenu()
+	xvarlabel(data_type_string)
+
+	xlabel("       ")
+	xlabel("       ")
+	xlabel("       ")
+xbutton("Create Cell", "cell_maker()")
+xpanel(0)
+
+hbox.intercept(0)
+hbox.map("SPECIFY PARAMETERS FOR SIMULATION", 100, 70, 700, 650)
+ 
+// update all the panels
+objectvar scene_vector_[1]
+{doNotify()}

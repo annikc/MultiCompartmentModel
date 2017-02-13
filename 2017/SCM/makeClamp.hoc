@@ -1,0 +1,29 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeClamp.hoc: constructs a patchclamp for the simulation
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// declarations /////////////////////////////////////////////
+
+// the clamp object
+objref clamp
+objref stim_clamp
+objref con_clamp
+
+
+// create clamp object
+clamp = new CClamp(0.5)
+clamp.amp = clamp_amp
+clamp.dur = clamp_dur  
+
+// create netstim object
+stim_clamp = new NetStim(0.5)
+stim_clamp.interval = clamp_interval  
+stim_clamp.number	= clamp_number    				// (average) number of spikes
+stim_clamp.start 	= clamp_start
+stim_clamp.noise 	= clamp_noise					// range 0 to 1. Fractional randomness.
+
+
+// create netcon object
+con_clamp = new NetCon(stim_clamp, clamp, 0, 0, 1) // [source, target, threshold, delay, weight]
+
+

@@ -1,0 +1,89 @@
+////////////////////////////////////////////////////////////////////////////////
+// COMMENTS  
+// 
+// in set parameters we changed bicarb -- change it back? different citation?
+// 
+// Not opening file correctly. Need to create directory for data?
+// 
+
+//////////////////// set the random number generator //////////////////////////
+use_mcell_ran4(0)                                                                   
+
+//////////////////// model and interface scripts //////////////////////////////
+xopen("setParameters.hoc")
+xopen("makeCell.hoc")
+xopen("makeSimpleWindows.hoc")
+//xopen("writeGeometry.hoc")
+
+
+strdef filename, fprefix
+fprefix = "no_data"
+objref runfile
+
+// create vectors to store header information 
+objref main_head, list_head, sec_head
+objref soma_count
+
+soma_count = new Vector()
+
+
+//create lists to store lists of sections
+objref soma_ecl, soma_KCC2_membp, soma_calc, soma_act_kin, soma_act_phos
+
+//create vectors to store data for writing
+objref Ecl_info, KCC2_MP_info, Ca_info, kin_info, phos_info
+
+//create vector for storing spike timingg interval values
+objref timesteps
+timesteps = new Vector()
+
+proc add_timestep(){
+	timesteps.append(5) //,-15,-10,-5,-4,-3,-2,-1,0,1,2,3,4,5,10,15,25,50)
+}
+add_timestep()
+
+
+// finalize vectors to store data values
+Ecl_info 	 = new Vector()
+KCC2_MP_info = new Vector()
+Ca_info 	 = new Vector()
+kin_info 	 = new Vector()
+phos_info 	 = new Vector()
+
+
+// the sampling frequency for recording (in Hz)
+rsamp = 2000                // sampling frequency 
+rstep = 1/(rsamp/1000)      // don't change this, it is the time per sample in milliseconds
+nstep = tstop*(rsamp/1000)  // don't change this, it is the number of samples per run, used to set aside space in memory for each vector
+ind_start = 0.1*nstep 		// beginning of plasticity induction interval, based on start time of 10000 ms in a 100000 ms run
+ind_end = (0.4*nstep)-1		// end of plasticity induction interval, based on induction for 30s in a 100000 ms run
+
+
+
+//-----------------------------------------------------------------------------
+// init()
+//-----------------------------------------------------------------------------
+// the finalization procedure for the numerical integrator                        /
+proc init() {                                                                       // sets everything to starting values
+	finitialize(v_init)                                                               // ffinalize takes as an argument voltage of all sections you want it to finalize 
+
+	if (cvode.active()) {  
+		cvode.re_init()
+	} else {
+		fcurrent()
+	}
+	frecord_init()
+	//reseed()
+}
+
+
+proc run_sim() {local i, j, step, num_steps
+	for step = 0, timesteps.size()-1 {
+		clamp_start = start_paired + timesteps.x[step]
+		xopen("makeClamp.hoc")
+		//data_init()
+		run()
+	}
+}
+
+print "          ... cell created successfully."

@@ -1,0 +1,143 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeSynapses.hoc: builds synapses in the model
+//
+// Note: this must be run *after* the cell geometry has been initialized
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// declarations /////////////////////////////////////////////
+
+// post-synaptic objects
+objref gaba_paired, gaba_unpaired
+gaba_paired = new List()
+gaba_unpaired = new List()
+
+// pre-synaptic objects
+objref pre_paired, pre_unpaired
+// pre_paired = new List()
+// pre_unpaired = new List()
+
+// connection objects
+objref con_paired, con_unpaired
+con_paired = new List()
+con_unpaired = new List()
+
+
+// Vectors for recording NetCon events
+objref gaba_paired_tvec, gaba_paired_idvec
+// gaba_paired_tvec   = new Vector()
+gaba_paired_idvec  = new Vector()
+objref gaba_unpaired_tvec, gaba_unpaired_idvec
+// gaba_unpaired_tvec   = new Vector()
+gaba_unpaired_idvec  = new Vector()
+
+//////////////////// procedure definitions ////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// make_gaba(location_paired, density_paired, location_unpaired, density_unpaired)
+//-----------------------------------------------------------------------------
+// creates the GABAergic post-synaptic objects, and places them in random 
+// positions on specifiec locations at the density indicated
+// locations are specified using the following:
+// 0 = soma
+// 1 = proximal
+// 2 = middle
+// 3 = distal
+
+proc make_gaba() { local secdis, secarea, numsyn, xpos, x, i, j, k  	localobj posr //declares local variablesa components, and add them to the lists
+
+// create a random number generator
+  	posr = new Random(seed_prompt)
+  	posr.uniform(0,1)
+  
+// add synapses in the soma
+  	// add the paired synapses
+  	if ($1 == 0) { // paired is in the soma
+	  	forsec somatic {
+			
+	  		// determine the distance from the center of the soma to the center of this section
+	    	secdis = distance(1)
+	   
+	    	// calculate the area of this section
+		    secarea = 0
+		    for (x,0) {
+		    	secarea = secarea + area(x)
+		    }
+		
+		    // calculate the number of synapses on this section
+		    numsyn = int(secarea*$2)
+		
+		    // for each synapse, pick a random location,
+		    // create gaba components, and add them to the lists
+		    for i=1,numsyn {
+		    	xpos = posr.repick()
+		    	gaba_paired.append(new GABAa(xpos))
+		    	gaba_paired.o(gaba_paired.count()-1).gmax = gmax_paired_soma									
+		    }
+	  	}
+	}
+	// add the unpaired synapses
+  	if ($3 == 0) { // unpaired is in the soma
+	  	forsec somatic {
+	
+	  		// determine the distance from the center of the soma to the center of this section
+	    	secdis = distance(1)
+	   
+	    	// calculate the area of this section
+		    secarea = 0
+		    for (x,0) {
+		    	secarea = secarea + area(x)
+		    }
+		
+		    // calculate the number of synapses on this section
+		    numsyn = int(secarea*$4)
+		
+		    // for each synapse, pick a random location,
+		    // create gaba components, and add them to the lists
+		    for i=1,numsyn {
+		    	xpos = posr.repick()
+		    	gaba_unpaired.append(new GABAa(xpos))
+		    	gaba_unpaired.o(gaba_unpaired.count()-1).gmax = gmax_unpaired_soma
+		    }
+	  	}
+	}
+}
+//-----------------------------------------------------------------------------
+// make_gabapre(interval_paired, number_paired, start_paired, interval_unpaired, 
+// 				number_unpaired, start_unpaired)
+//-----------------------------------------------------------------------------
+// creates the presynaptic objects for the GABAergic synapses
+proc make_gabapre() { 
+	// create paired objects
+	pre_paired = new NetStim()
+	pre_paired.interval = $1
+	pre_paired.number 	= $2 
+	pre_paired.start 	= $3
+	pre_paired.noise 	= 0
+
+	// create unpaired objects
+	pre_unpaired = new NetStim()
+	pre_unpaired.interval 	= $4
+	pre_unpaired.number 	= $5 
+	pre_unpaired.start 		= $6
+	pre_unpaired.noise 		= 0
+}
+
+//-----------------------------------------------------------------------------
+// make_gabacon()
+//-----------------------------------------------------------------------------
+// creates all of the connections between pre and post-synaptic objects
+// for GABAergic synapses
+proc make_gabacon() {
+	for i = 0,gaba_paired.count()-1 {
+		con_paired.append(new NetCon(pre_paired, gaba_paired.o(i), 0, 0, 1))
+	}
+	for i = 0,gaba_unpaired.count()-1 {
+		con_unpaired.append(new NetCon(pre_unpaired, gaba_unpaired.o(i), 0, 0, 1))
+	}
+}
+
+
+//////////////////// procedure calls /////////////////////////////////////
+make_gaba(location_paired, density_paired, location_unpaired, density_unpaired)
+make_gabapre(interval_paired, number_paired, start_paired, interval_unpaired, number_unpaired, start_unpaired)
+make_gabacon()

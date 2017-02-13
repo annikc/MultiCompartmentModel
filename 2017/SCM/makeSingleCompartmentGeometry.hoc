@@ -1,0 +1,60 @@
+///////////////////////////////////////////////////////////////////////////////
+// makeGeometry.hoc: builds the cell's geometry
+///////////////////////////////////////////////////////////////////////////////
+
+//////////////////// declarations /////////////////////////////////////////////
+create soma
+objref somatic
+
+//////////////////// procedure definitions ////////////////////////////////////
+
+//-----------------------------------------------------------------------------
+// geom_nseg()
+//-----------------------------------------------------------------------------
+// set the number of segments for each section (10 times electrical limit)			// *** what is "electrical limit?"
+
+proc geom_nseg() {
+  soma.diam = 3 // from https://synapseweb.clm.utexas.edu/dimensions-dendrites, rough estimate 
+  soma.L = 10
+  // for calculating segment numbers
+  freq = 100      // Hz, frequency at which AC length constant will be computed		// in this proc, number of segments is a function of "freq"
+  d_lambda = 0.1
+
+  forall {																			// nseg is the integer value of the calculation in the brackets
+  nseg  = 1 //int((L/(d_lambda*lambda_f(freq))+0.9)/2)*20 + 11 						// *** what is lambda_f(something)? how to parse this eq'n? 
+  }
+}
+
+//-----------------------------------------------------------------------------
+// subsets()
+//-----------------------------------------------------------------------------
+// defines subsets of the segments
+
+proc subsets() { local i 					
+  	somatic = new SectionList()
+  	soma somatic.append()
+}
+
+//-----------------------------------------------------------------------------
+// biophys()
+//-----------------------------------------------------------------------------
+// sets the biophysics of the segments (capacitance and axial resistance)
+
+proc biophys() {
+
+  forsec somatic { 
+    cm = cm_soma
+    Ra = Ra_soma
+  }
+}
+
+//////////////////// procedure calls /////////////////////////////////////
+
+// set access to the soma
+access soma
+
+// define the cell
+geom_nseg()
+distance()
+subsets()
+biophys()
